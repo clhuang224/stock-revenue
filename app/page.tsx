@@ -6,14 +6,10 @@ import {
   Button,
   Container,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
+import BaseTable from "./components/BaseTable";
 
 type StockOption = {
   stockId: string;
@@ -93,15 +89,38 @@ const revenuePoints: RevenuePoint[] = [
   { label: "2023/07", revenue: 1165000, yoyGrowth: 4.8 },
 ];
 
-const tableMonths = ["202307", "202308", "202309", "202310", "202311", "202312"];
+const tableColumns = [
+  { id: "202307", label: "202307" },
+  { id: "202308", label: "202308" },
+  { id: "202309", label: "202309" },
+  { id: "202310", label: "202310" },
+  { id: "202311", label: "202311" },
+  { id: "202312", label: "202312" },
+];
 const tableRows = [
   {
+    id: "monthly-revenue",
     label: "每月營收",
-    values: ["587,040", "9,991,845", "9,704,224", "6,431,665", "8,169,564", "11,548,000"],
+    cells: {
+      "202307": "587,040",
+      "202308": "9,991,845",
+      "202309": "9,704,224",
+      "202310": "6,431,665",
+      "202311": "8,169,564",
+      "202312": "11,548,000",
+    },
   },
   {
+    id: "monthly-yoy-growth",
     label: "單月營收年增率 (%)",
-    values: ["53.65", "-12.23", "-0.52", "-31.04", "5.18", "26.35"],
+    cells: {
+      "202307": "53.65",
+      "202308": "-12.23",
+      "202309": "-0.52",
+      "202310": "-31.04",
+      "202311": "5.18",
+      "202312": "26.35",
+    },
   },
 ];
 
@@ -332,69 +351,7 @@ export default function Home() {
             詳細數據
           </Button>
 
-          <TableContainer
-            component={Box}
-            sx={{
-              overflowX: "auto",
-              borderTop: "1px solid var(--border)",
-              borderLeft: "1px solid var(--border)",
-            }}
-          >
-            <Table size="small" sx={{ tableLayout: "fixed", minWidth: 760 }}>
-              <TableBody>
-                <TableRow>
-                  <TableCell
-                    component="th"
-                    sx={{
-                      width: 160,
-                      bgcolor: "var(--table-header)",
-                      fontWeight: 700,
-                      borderRight: "1px solid var(--border)",
-                    }}
-                  >
-                    年度月份
-                  </TableCell>
-                  {tableMonths.map((month) => (
-                    <TableCell
-                      key={month}
-                      align="center"
-                      sx={{
-                        bgcolor: "var(--table-header-light)",
-                        fontWeight: 700,
-                        borderRight: "1px solid var(--border)",
-                      }}
-                    >
-                      {month}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                {tableRows.map((row) => (
-                  <TableRow key={row.label}>
-                    <TableCell
-                      component="th"
-                      sx={{
-                        bgcolor: "var(--table-header)",
-                        fontWeight: 700,
-                        borderRight: "1px solid var(--border)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {row.label}
-                    </TableCell>
-                    {row.values.map((value, index) => (
-                      <TableCell
-                        key={`${row.label}-${tableMonths[index]}`}
-                        align="center"
-                        sx={{ borderRight: "1px solid var(--border)", color: "text.secondary" }}
-                      >
-                        {value}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <BaseTable firstColumnLabel="年度月份" columns={tableColumns} rows={tableRows} />
         </Paper>
 
         <Box sx={{ mt: 2.4, textAlign: "center", color: "text.secondary" }}>
