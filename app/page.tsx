@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import BaseTable from './components/BaseTable'
+import RevenueTrendChart from './components/RevenueTrendChart'
 
 type StockOption = {
   stockId: string
@@ -124,24 +125,7 @@ const tableRows = [
   },
 ]
 
-const axisTicks = [20000000, 15000000, 10000000, 5000000, 0]
 const selectedStock = stocks[3]
-const maxRevenue = Math.max(...revenuePoints.map((point) => point.revenue))
-
-function formatNumber(value: number) {
-  return value.toLocaleString('en-US')
-}
-
-function buildLinePoints() {
-  return revenuePoints
-    .map((point, index) => {
-      const x = (index / (revenuePoints.length - 1)) * 1000
-      const y = 28 + ((12.8 - point.yoyGrowth) / (12.8 - 4.2)) * 304
-
-      return `${x.toFixed(1)},${y.toFixed(1)}`
-    })
-    .join(' ')
-}
 
 export default function Home() {
   return (
@@ -226,174 +210,7 @@ export default function Home() {
             </Button>
           </Box>
 
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '72px minmax(0, 1fr) 42px',
-              columnGap: 1.5,
-            }}
-          >
-            <Box sx={{ pt: 4.4, textAlign: 'right' }}>
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.secondary', fontWeight: 700 }}
-              >
-                千元
-              </Typography>
-              {axisTicks.map((tick) => (
-                <Typography
-                  key={tick}
-                  variant="caption"
-                  sx={{ display: 'block', mt: 4.05, color: 'text.secondary' }}
-                >
-                  {formatNumber(tick)}
-                </Typography>
-              ))}
-            </Box>
-
-            <Box>
-              <Box
-                sx={{
-                  height: 28,
-                  mb: 1,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 2,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
-                  <Box
-                    sx={{
-                      width: 16,
-                      height: 10,
-                      bgcolor: 'var(--chart-revenue)',
-                    }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    每月營收
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
-                  <Box
-                    sx={{
-                      width: 16,
-                      height: 10,
-                      bgcolor: 'var(--chart-growth)',
-                    }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    單月營收年增率 (%)
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  position: 'relative',
-                  height: 340,
-                  borderLeft: '1px solid var(--grid-line)',
-                  borderBottom: '1px solid var(--grid-line)',
-                  backgroundImage:
-                    'linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)',
-                  backgroundSize: '100% 68px, 20% 100%',
-                  overflow: 'hidden',
-                }}
-              >
-                <Box
-                  component="svg"
-                  aria-hidden="true"
-                  viewBox="0 0 1000 360"
-                  preserveAspectRatio="none"
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 2,
-                    width: '100%',
-                    height: '100%',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <polyline
-                    points={buildLinePoints()}
-                    fill="none"
-                    stroke="var(--chart-growth)"
-                    strokeWidth="4"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    gap: '4px',
-                    px: 0.6,
-                  }}
-                >
-                  {revenuePoints.map((point) => (
-                    <Box
-                      key={point.label}
-                      title={`${point.label} 月營收 ${formatNumber(point.revenue)} 千元`}
-                      sx={{
-                        flex: '1 1 0',
-                        minWidth: 3,
-                        height: `${Math.max(8, (point.revenue / maxRevenue) * 78)}%`,
-                        bgcolor: 'var(--chart-revenue-soft)',
-                        border: '1px solid var(--chart-revenue)',
-                        borderBottom: 0,
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  pt: 1.4,
-                }}
-              >
-                {['2019', '2020', '2021', '2022', '2023'].map((year) => (
-                  <Typography
-                    key={year}
-                    variant="caption"
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    {year}
-                  </Typography>
-                ))}
-              </Box>
-            </Box>
-
-            <Box sx={{ pt: 0.4, textAlign: 'right' }}>
-              <Typography
-                variant="caption"
-                sx={{ color: 'text.secondary', fontWeight: 700 }}
-              >
-                %
-              </Typography>
-              {['12', '11', '10', '9', '8', '7', '6', '5', '4'].map((tick) => (
-                <Typography
-                  key={tick}
-                  variant="caption"
-                  sx={{ display: 'block', mt: 2.48, color: 'text.secondary' }}
-                >
-                  {tick}
-                </Typography>
-              ))}
-            </Box>
-          </Box>
+          <RevenueTrendChart data={revenuePoints} />
         </Paper>
 
         <Paper
