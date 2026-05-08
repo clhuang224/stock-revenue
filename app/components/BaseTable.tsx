@@ -1,24 +1,31 @@
-import type { ReactNode } from "react";
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import type { ReactNode } from 'react'
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+} from '@mui/material'
 
 export type BaseTableColumn = {
-  id: string;
-  label: ReactNode;
-};
+  id: string
+  label: ReactNode
+}
 
 export type BaseTableRow = {
-  id: string;
-  label: ReactNode;
-  cells: Record<string, ReactNode>;
-};
+  id: string
+  label: ReactNode
+  cells: Record<string, ReactNode>
+}
 
 type BaseTableProps = {
-  firstColumnLabel: ReactNode;
-  columns: BaseTableColumn[];
-  rows: BaseTableRow[];
-  minWidth?: number;
-  firstColumnWidth?: number;
-};
+  firstColumnLabel: ReactNode
+  columns: BaseTableColumn[]
+  rows: BaseTableRow[]
+  minWidth?: number
+  firstColumnWidth?: number
+}
 
 export default function BaseTable({
   firstColumnLabel,
@@ -31,21 +38,24 @@ export default function BaseTable({
     <TableContainer
       component={Box}
       sx={{
-        overflowX: "auto",
-        borderTop: "1px solid var(--border)",
-        borderLeft: "1px solid var(--border)",
+        overflowX: 'auto',
+        borderTop: '1px solid var(--border)',
+        borderLeft: '1px solid var(--border)',
       }}
     >
-      <Table size="small" sx={{ tableLayout: "fixed", minWidth }}>
+      <Table
+        size="small"
+        sx={{ tableLayout: 'fixed', minWidth }}
+      >
         <TableBody>
           <TableRow>
             <TableCell
               component="th"
               sx={{
                 width: firstColumnWidth,
-                bgcolor: "var(--table-header)",
+                bgcolor: 'var(--table-header)',
                 fontWeight: 700,
-                borderRight: "1px solid var(--border)",
+                borderRight: '1px solid var(--border)',
               }}
             >
               {firstColumnLabel}
@@ -55,9 +65,9 @@ export default function BaseTable({
                 key={column.id}
                 align="center"
                 sx={{
-                  bgcolor: "var(--table-header-light)",
+                  bgcolor: 'var(--table-header-light)',
                   fontWeight: 700,
-                  borderRight: "1px solid var(--border)",
+                  borderRight: '1px solid var(--border)',
                 }}
               >
                 {column.label}
@@ -69,10 +79,10 @@ export default function BaseTable({
               <TableCell
                 component="th"
                 sx={{
-                  bgcolor: "var(--table-header)",
+                  bgcolor: 'var(--table-header)',
                   fontWeight: 700,
-                  borderRight: "1px solid var(--border)",
-                  whiteSpace: "nowrap",
+                  borderRight: '1px solid var(--border)',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {row.label}
@@ -81,7 +91,10 @@ export default function BaseTable({
                 <TableCell
                   key={`${row.id}-${column.id}`}
                   align="center"
-                  sx={{ borderRight: "1px solid var(--border)", color: "text.secondary" }}
+                  sx={{
+                    borderRight: '1px solid var(--border)',
+                    color: 'text.secondary',
+                  }}
                 >
                   {row.cells[column.id]}
                 </TableCell>
@@ -91,5 +104,5 @@ export default function BaseTable({
         </TableBody>
       </Table>
     </TableContainer>
-  );
+  )
 }

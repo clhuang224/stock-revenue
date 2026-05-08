@@ -412,11 +412,11 @@ TaiwanStockInfo
 
 ```ts
 type StockOption = {
-  stockId: string;
-  stockName: string;
-  industryCategory: string;
-  type: string;
-};
+  stockId: string
+  stockName: string
+  industryCategory: string
+  type: string
+}
 ```
 
 清理規則：
@@ -459,13 +459,13 @@ TaiwanStockMonthRevenue
 
 ```ts
 type RevenuePoint = {
-  date: string;
-  year: number;
-  month: number;
-  label: string;
-  revenue: number;
-  yoyGrowth: number | null;
-};
+  date: string
+  year: number
+  month: number
+  label: string
+  revenue: number
+  yoyGrowth: number | null
+}
 ```
 
 排序：
@@ -688,8 +688,8 @@ Response:
 
 ```ts
 type StocksResponse = {
-  data: StockOption[];
-};
+  data: StockOption[]
+}
 ```
 
 錯誤：
@@ -707,8 +707,8 @@ Query:
 
 ```ts
 type RevenueQuery = {
-  stockId: string;
-};
+  stockId: string
+}
 ```
 
 Response:
@@ -716,11 +716,11 @@ Response:
 ```ts
 type RevenueResponse = {
   stock: {
-    stockId: string;
-    stockName: string;
-  };
-  data: RevenuePoint[];
-};
+    stockId: string
+    stockName: string
+  }
+  data: RevenuePoint[]
+}
 ```
 
 錯誤：

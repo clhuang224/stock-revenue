@@ -6,5 +6,6 @@
 - FinMind LLM full reference: https://finmind.github.io/llms-full.txt
 
 Used datasets:
+
 - TaiwanStockInfo
 - TaiwanStockMonthRevenue
