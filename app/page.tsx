@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import {
   Autocomplete,
   Box,
@@ -8,126 +10,72 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { revenueQueryOptions } from './apis/revenue'
+import { stocksQueryOptions } from './apis/stocks'
 import BaseTable from './components/BaseTable'
 import HomePanel from './components/home/HomePanel'
 import RevenueTrendChart from './components/RevenueTrendChart'
+import type { RevenuePoint } from './interfaces/RevenuePoint'
+import type { StockOption } from './interfaces/StockOption'
 
-type StockOption = {
-  stockId: string
-  stockName: string
+const defaultStockId = '2867'
+
+function formatNumber(value: number) {
+  return value.toLocaleString('en-US')
 }
 
-type RevenuePoint = {
-  label: string
-  revenue: number
-  yoyGrowth: number
+function formatPercent(value: number | null) {
+  return value === null ? '-' : value.toFixed(2)
 }
 
-const stocks: StockOption[] = [
-  { stockId: '2330', stockName: '台積電' },
-  { stockId: '2317', stockName: '鴻海' },
-  { stockId: '2454', stockName: '聯發科' },
-  { stockId: '2867', stockName: '三商壽' },
-  { stockId: '2412', stockName: '中華電' },
-  { stockId: '2603', stockName: '長榮' },
-]
+function getTableMonthId(point: RevenuePoint) {
+  return `${point.year}${String(point.month).padStart(2, '0')}`
+}
 
-const revenuePoints: RevenuePoint[] = [
-  { label: '2019/01', revenue: 12680000, yoyGrowth: 10.4 },
-  { label: '2019/02', revenue: 13120000, yoyGrowth: 11.6 },
-  { label: '2019/03', revenue: 13800000, yoyGrowth: 10.8 },
-  { label: '2019/04', revenue: 14450000, yoyGrowth: 10.1 },
-  { label: '2019/05', revenue: 13270000, yoyGrowth: 10.3 },
-  { label: '2019/06', revenue: 14760000, yoyGrowth: 10.7 },
-  { label: '2019/07', revenue: 14240000, yoyGrowth: 11.2 },
-  { label: '2019/08', revenue: 13690000, yoyGrowth: 11.7 },
-  { label: '2019/09', revenue: 13420000, yoyGrowth: 10.9 },
-  { label: '2019/10', revenue: 14180000, yoyGrowth: 11.4 },
-  { label: '2019/11', revenue: 12990000, yoyGrowth: 11.6 },
-  { label: '2019/12', revenue: 15120000, yoyGrowth: 12.2 },
-  { label: '2020/01', revenue: 17380000, yoyGrowth: 12.4 },
-  { label: '2020/02', revenue: 10860000, yoyGrowth: 9.2 },
-  { label: '2020/03', revenue: 11470000, yoyGrowth: 9.4 },
-  { label: '2020/04', revenue: 15250000, yoyGrowth: 9.9 },
-  { label: '2020/05', revenue: 16130000, yoyGrowth: 9.9 },
-  { label: '2020/06', revenue: 15920000, yoyGrowth: 9.5 },
-  { label: '2020/07', revenue: 11250000, yoyGrowth: 9.2 },
-  { label: '2020/08', revenue: 13470000, yoyGrowth: 8.6 },
-  { label: '2020/09', revenue: 16550000, yoyGrowth: 8.2 },
-  { label: '2020/10', revenue: 17100000, yoyGrowth: 8.0 },
-  { label: '2020/11', revenue: 17840000, yoyGrowth: 8.7 },
-  { label: '2020/12', revenue: 14700000, yoyGrowth: 9.3 },
-  { label: '2021/01', revenue: 15620000, yoyGrowth: 9.1 },
-  { label: '2021/02', revenue: 9830000, yoyGrowth: 9.0 },
-  { label: '2021/03', revenue: 10690000, yoyGrowth: 8.9 },
-  { label: '2021/04', revenue: 11380000, yoyGrowth: 8.4 },
-  { label: '2021/05', revenue: 16480000, yoyGrowth: 8.0 },
-  { label: '2021/06', revenue: 16840000, yoyGrowth: 8.2 },
-  { label: '2021/07', revenue: 17920000, yoyGrowth: 9.3 },
-  { label: '2021/08', revenue: 9080000, yoyGrowth: 9.0 },
-  { label: '2021/09', revenue: 10340000, yoyGrowth: 8.9 },
-  { label: '2021/10', revenue: 11270000, yoyGrowth: 9.1 },
-  { label: '2021/11', revenue: 10620000, yoyGrowth: 8.7 },
-  { label: '2021/12', revenue: 11440000, yoyGrowth: 9.0 },
-  { label: '2022/01', revenue: 10740000, yoyGrowth: 9.0 },
-  { label: '2022/02', revenue: 12690000, yoyGrowth: 8.8 },
-  { label: '2022/03', revenue: 1090000, yoyGrowth: 7.1 },
-  { label: '2022/04', revenue: 942000, yoyGrowth: 6.8 },
-  { label: '2022/05', revenue: 730000, yoyGrowth: 6.6 },
-  { label: '2022/06', revenue: 681000, yoyGrowth: 5.8 },
-  { label: '2022/07', revenue: 1138000, yoyGrowth: 5.6 },
-  { label: '2022/08', revenue: 801000, yoyGrowth: 5.2 },
-  { label: '2022/09', revenue: 726000, yoyGrowth: 5.4 },
-  { label: '2022/10', revenue: 793000, yoyGrowth: 5.2 },
-  { label: '2022/11', revenue: 1188000, yoyGrowth: 5.1 },
-  { label: '2022/12', revenue: 1368000, yoyGrowth: 5.0 },
-  { label: '2023/01', revenue: 843000, yoyGrowth: 5.2 },
-  { label: '2023/02', revenue: 1472000, yoyGrowth: 5.0 },
-  { label: '2023/03', revenue: 1508000, yoyGrowth: 4.9 },
-  { label: '2023/04', revenue: 1016000, yoyGrowth: 4.9 },
-  { label: '2023/05', revenue: 982000, yoyGrowth: 4.9 },
-  { label: '2023/06', revenue: 789000, yoyGrowth: 4.8 },
-  { label: '2023/07', revenue: 1165000, yoyGrowth: 4.8 },
-]
+function buildTableColumns(revenuePoints: RevenuePoint[]) {
+  return revenuePoints.map((point) => ({
+    id: getTableMonthId(point),
+    label: getTableMonthId(point),
+  }))
+}
 
-const tableColumns = [
-  { id: '202307', label: '202307' },
-  { id: '202308', label: '202308' },
-  { id: '202309', label: '202309' },
-  { id: '202310', label: '202310' },
-  { id: '202311', label: '202311' },
-  { id: '202312', label: '202312' },
-]
-const tableRows = [
-  {
-    id: 'monthly-revenue',
-    label: '每月營收',
-    cells: {
-      '202307': '587,040',
-      '202308': '9,991,845',
-      '202309': '9,704,224',
-      '202310': '6,431,665',
-      '202311': '8,169,564',
-      '202312': '11,548,000',
+function buildTableRows(revenuePoints: RevenuePoint[]) {
+  return [
+    {
+      id: 'monthly-revenue',
+      label: '每月營收',
+      cells: Object.fromEntries(
+        revenuePoints.map((point) => [
+          getTableMonthId(point),
+          formatNumber(point.revenue),
+        ]),
+      ),
     },
-  },
-  {
-    id: 'monthly-yoy-growth',
-    label: '單月營收年增率 (%)',
-    cells: {
-      '202307': '53.65',
-      '202308': '-12.23',
-      '202309': '-0.52',
-      '202310': '-31.04',
-      '202311': '5.18',
-      '202312': '26.35',
+    {
+      id: 'monthly-yoy-growth',
+      label: '單月營收年增率 (%)',
+      cells: Object.fromEntries(
+        revenuePoints.map((point) => [
+          getTableMonthId(point),
+          formatPercent(point.yoyGrowth),
+        ]),
+      ),
     },
-  },
-]
-
-const selectedStock = stocks[3]
+  ]
+}
 
 export default function Home() {
+  const [selectedStockId, setSelectedStockId] = useState(defaultStockId)
+  const stocksQuery = useQuery(stocksQueryOptions())
+  const revenueQuery = useQuery(revenueQueryOptions(selectedStockId))
+  const stocks = stocksQuery.data ?? []
+  const selectedStock =
+    stocks.find((stock) => stock.stockId === selectedStockId) ?? null
+  const revenuePoints = revenueQuery.data ?? []
+  const tableColumns = buildTableColumns(revenuePoints)
+  const tableRows = buildTableRows(revenuePoints)
+  const hasRevenueData = revenuePoints.length > 0
+
   return (
     <Box
       component="main"
@@ -150,8 +98,18 @@ export default function Home() {
           <Autocomplete
             size="small"
             options={stocks}
-            defaultValue={selectedStock}
+            value={selectedStock}
+            loading={stocksQuery.isLoading}
+            getOptionKey={(option) => option.stockId}
             getOptionLabel={(option) => `${option.stockId} ${option.stockName}`}
+            isOptionEqualToValue={(option, value) =>
+              option.stockId === value.stockId
+            }
+            onChange={(_, option: StockOption | null) => {
+              if (option) {
+                setSelectedStockId(option.stockId)
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -181,7 +139,11 @@ export default function Home() {
         }}
       >
         <HomePanel
-          title={`${selectedStock.stockName} (${selectedStock.stockId})`}
+          title={
+            selectedStock
+              ? `${selectedStock.stockName} (${selectedStock.stockId})`
+              : selectedStockId
+          }
         />
 
         <HomePanel
@@ -204,7 +166,21 @@ export default function Home() {
             </Button>
           }
         >
-          <RevenueTrendChart data={revenuePoints} />
+          {revenueQuery.isLoading ? (
+            <Typography sx={{ color: 'text.secondary' }}>
+              資料載入中...
+            </Typography>
+          ) : revenueQuery.isError ? (
+            <Typography sx={{ color: 'error.main' }}>
+              月營收資料載入失敗，請稍後再試。
+            </Typography>
+          ) : hasRevenueData ? (
+            <RevenueTrendChart data={revenuePoints} />
+          ) : (
+            <Typography sx={{ color: 'text.secondary' }}>
+              查無月營收資料。
+            </Typography>
+          )}
         </HomePanel>
 
         <HomePanel
@@ -218,11 +194,26 @@ export default function Home() {
             </Button>
           }
         >
-          <BaseTable
-            firstColumnLabel="年度月份"
-            columns={tableColumns}
-            rows={tableRows}
-          />
+          {revenueQuery.isLoading ? (
+            <Typography sx={{ color: 'text.secondary' }}>
+              資料載入中...
+            </Typography>
+          ) : revenueQuery.isError ? (
+            <Typography sx={{ color: 'error.main' }}>
+              詳細資料載入失敗，請稍後再試。
+            </Typography>
+          ) : hasRevenueData ? (
+            <BaseTable
+              firstColumnLabel="年度月份"
+              columns={tableColumns}
+              rows={tableRows}
+              minWidth={Math.max(760, 160 + tableColumns.length * 110)}
+            />
+          ) : (
+            <Typography sx={{ color: 'text.secondary' }}>
+              查無詳細資料。
+            </Typography>
+          )}
         </HomePanel>
 
         <Box sx={{ mt: 2.4, textAlign: 'center', color: 'text.secondary' }}>

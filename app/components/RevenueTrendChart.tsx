@@ -5,7 +5,7 @@ import BaseMixedChart from './BaseMixedChart'
 export type RevenueTrendChartPoint = {
   label: string
   revenue: number
-  yoyGrowth: number
+  yoyGrowth: number | null
 }
 
 type RevenueTrendChartProps = {
