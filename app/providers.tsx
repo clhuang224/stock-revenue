@@ -3,6 +3,15 @@
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 
 const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 375,
+      md: 717,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
   palette: {
     primary: {
       main: '#1976d2',

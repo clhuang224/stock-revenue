@@ -172,13 +172,13 @@ export default function Home() {
       </Box>
 
       <Container
-        maxWidth={false}
-        sx={{ maxWidth: 850, py: 24 }}
+        maxWidth="md"
+        sx={{ py: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}
       >
         <Paper
           variant="outlined"
           square
-          sx={{ mb: 1, px: 2.5, py: 1.8, borderColor: 'var(--border)' }}
+          sx={{ px: 2.5, py: 1.8, borderColor: 'var(--border)' }}
         >
           <Typography
             component="h1"
