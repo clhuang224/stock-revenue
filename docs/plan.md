@@ -190,6 +190,39 @@ Tooltip 內容：
 - Deployment: Vercel
 - Package Manager: pnpm
 
+## 資料夾結構
+
+```txt
+app/api/                    # Next.js Route Handlers，處理 request 驗證、server-side token 與 API response
+  stocks/route.ts
+  revenue/route.ts
+
+app/apis/                   # 前端 fetcher、TanStack Query options 與外部資料對接層
+  stocks.ts                 # 股票清單 query function
+  revenue.ts                # 月營收 query function
+  finmind/                  # FinMind API client 與原始資料轉換
+    client.ts
+    stockService.ts
+    revenueService.ts
+
+app/components/             # 共用 UI 元件與首頁區塊元件
+  BaseMixedChart.tsx
+  BaseTable.tsx
+  RevenueTrendChart.tsx
+  home/                     # 首頁專用版面元件
+    HomePanel.tsx
+
+app/interfaces/             # FinMind 原始 response、dataset 型別與本專案 API response 型別
+  FinMindResponse.ts
+  RevenuePoint.ts
+  StockOption.ts
+  TaiwanStockInfo.ts
+  TaiwanStockMonthRevenue.ts
+
+app/types/                  # 跨 dataset 共用的基礎型別
+  TimeType.ts
+```
+
 ## Next.js 文件注意事項
 
 本專案使用的 Next.js 版本可能與常見教學或舊版經驗不同。開發前需查閱本機文件：

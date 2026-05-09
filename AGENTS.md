@@ -15,3 +15,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ```txt
 Co-authored-by: Codex GPT-5.5 <noreply@openai.com>
 ```
+
+## Validation
+
+- Do not use `pnpm dev`, `npm run dev`, `pnpm build`, or `npm run build` for validation.
+- Prefer `npx tsc --noEmit`, `npm run lint`, and `npm run format:check`.

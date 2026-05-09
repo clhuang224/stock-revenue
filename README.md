@@ -23,6 +23,7 @@
 - TypeScript
 - MUI
 - MUI X Charts
+- TanStack Query
 - FinMind API
 - Vercel
 - pnpm
@@ -80,60 +81,60 @@ http://localhost:3000
 
 ## Scripts
 
-```bash
-pnpm dev
-```
-
-啟動 Next.js development server。
-
-```bash
-pnpm build
-```
-
-建立 production build。
-
-```bash
-pnpm start
-```
-
-啟動 production server。
-
-```bash
-pnpm lint
-```
-
-執行 ESLint。
+| Command                | Description                     |
+| ---------------------- | ------------------------------- |
+| `pnpm dev`             | 啟動 Next.js development server |
+| `pnpm build`           | 建立 production build           |
+| `pnpm start`           | 啟動 production server          |
+| `npm run lint`         | 執行 ESLint                     |
+| `npm run format:check` | 檢查 Prettier 格式              |
 
 ## Architecture
 
-本專案採用 Next.js hybrid rendering：
+本專案採用 Next.js API route 作為 FinMind proxy。瀏覽器只呼叫本專案 API，FinMind token 只存在 server-side runtime。
 
-- Server side:
-  - 讀取 `FINMIND_API_TOKEN`。
-  - 透過 API route 代理 FinMind API。
-  - 預載預設股票資料。
-  - 設定 metadata。
-  - 對低頻更新資料設定 cache。
-- Client side:
-  - 股票搜尋與切換。
-  - 圖表 hover 與互動。
-  - 表格橫向瀏覽。
-  - loading、error、empty state。
+資料流：
 
-預計 API route：
+```txt
+Browser
+  -> /api/stocks or /api/revenue
+  -> app/apis/finmind/client.ts
+  -> FinMind API
+```
+
+主要 API route：
 
 - `GET /api/stocks`: 回傳股票搜尋清單。
 - `GET /api/revenue?stockId=2330`: 回傳指定股票近 5 年月營收資料。
 
-前端只呼叫本專案 API route，不直接把 FinMind token 傳到瀏覽器。
+前端資料請求集中在 `app/apis/stocks.ts` 與 `app/apis/revenue.ts`，並透過 TanStack Query 管理 cache、loading 與 error state。
+
+### Folder Structure
+
+```txt
+app/api/                    # Next.js Route Handlers，驗證 request、代理資料與回傳 API response
+  stocks/route.ts
+  revenue/route.ts
+
+app/apis/                   # 前端 fetcher、TanStack Query options 與外部資料對接層
+  stocks.ts                 # 股票清單 query function
+  revenue.ts                # 月營收 query function
+  finmind/                  # FinMind API client 與原始資料轉換
+    client.ts
+    stockService.ts
+    revenueService.ts
+
+app/interfaces/             # FinMind 原始 response、dataset 型別與本專案 API response 型別
+  FinMindResponse.ts
+  RevenuePoint.ts
+  StockOption.ts
+  TaiwanStockInfo.ts
+  TaiwanStockMonthRevenue.ts
+```
 
 ## Deployment
 
-部署目標為 Vercel，原因：
-
-- GitHub Pages 是靜態主機，不適合保護 API token。
-- 本專案需要 server-side API proxy 呼叫 FinMind。
-- Vercel 可直接支援 Next.js App Router、Route Handlers、server-side environment variables 與 SSR。
+部署目標為 Vercel，讓 Next.js Route Handlers 可以在 server-side 讀取 `FINMIND_API_TOKEN` 並代理 FinMind API。
 
 部署步驟：
 
