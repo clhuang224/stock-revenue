@@ -81,8 +81,8 @@ http://localhost:3000
 
 ## Scripts
 
-| Command             | Description                     |
-| ------------------- | ------------------------------- |
+| Command                 | Description                     |
+| ----------------------- | ------------------------------- |
 | `pnpm run dev`          | 啟動 Next.js development server |
 | `pnpm run build`        | 建立 production build           |
 | `pnpm run start`        | 啟動 production server          |
