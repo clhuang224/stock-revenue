@@ -1,5 +1,5 @@
 import { TimeType } from '../types/TimeType'
-import { FinMindResponse } from './FinMindResponse'
+import { FinMindSuccessResponse } from './FinMindResponse'
 
 export interface TaiwanStockInfo {
   industry_category: string
@@ -9,8 +9,4 @@ export interface TaiwanStockInfo {
   date: TimeType
 }
 
-export type TaiwanStockInfoResponse = FinMindResponse<
-  'success',
-  200,
-  TaiwanStockInfo[]
->
+export type TaiwanStockInfoResponse = FinMindSuccessResponse<TaiwanStockInfo[]>
