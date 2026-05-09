@@ -5,11 +5,11 @@ import {
   Box,
   Button,
   Container,
-  Paper,
   TextField,
   Typography,
 } from '@mui/material'
 import BaseTable from './components/BaseTable'
+import HomePanel from './components/home/HomePanel'
 import RevenueTrendChart from './components/RevenueTrendChart'
 
 type StockOption = {
@@ -173,27 +173,19 @@ export default function Home() {
 
       <Container
         maxWidth="md"
-        sx={{ py: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}
+        sx={{
+          py: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+        }}
       >
-        <Paper
-          variant="outlined"
-          square
-          sx={{ px: 2.5, py: 1.8, borderColor: 'var(--border)' }}
-        >
-          <Typography
-            component="h1"
-            sx={{ fontSize: 18, fontWeight: 700 }}
-          >
-            {selectedStock.stockName} ({selectedStock.stockId})
-          </Typography>
-        </Paper>
+        <HomePanel
+          title={`${selectedStock.stockName} (${selectedStock.stockId})`}
+        />
 
-        <Paper
-          variant="outlined"
-          square
-          sx={{ px: 2.5, pt: 2.2, pb: 1.8, borderColor: 'var(--border)' }}
-        >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <HomePanel
+          leftAction={
             <Button
               variant="contained"
               disableElevation
@@ -201,6 +193,8 @@ export default function Home() {
             >
               每月營收
             </Button>
+          }
+          rightAction={
             <Button
               variant="contained"
               disableElevation
@@ -208,36 +202,28 @@ export default function Home() {
             >
               近 5 年
             </Button>
-          </Box>
-
-          <RevenueTrendChart data={revenuePoints} />
-        </Paper>
-
-        <Paper
-          variant="outlined"
-          square
-          sx={{
-            mt: 1,
-            px: 2.5,
-            pt: 2.2,
-            pb: 1.6,
-            borderColor: 'var(--border)',
-          }}
+          }
         >
-          <Button
-            variant="contained"
-            disableElevation
-            sx={{ mb: 2.2, px: 2.2 }}
-          >
-            詳細數據
-          </Button>
+          <RevenueTrendChart data={revenuePoints} />
+        </HomePanel>
 
+        <HomePanel
+          leftAction={
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{ px: 2.2 }}
+            >
+              詳細數據
+            </Button>
+          }
+        >
           <BaseTable
             firstColumnLabel="年度月份"
             columns={tableColumns}
             rows={tableRows}
           />
-        </Paper>
+        </HomePanel>
 
         <Box sx={{ mt: 2.4, textAlign: 'center', color: 'text.secondary' }}>
           <Typography variant="body2">
