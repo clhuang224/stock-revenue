@@ -17,6 +17,19 @@ function formatNumber(value: number) {
   return value.toLocaleString('en-US')
 }
 
+function isFirstMonthOfYear(value: string | number | Date) {
+  return String(value).endsWith('/01')
+}
+
+function formatMonthAxisLabel(
+  value: string | number | Date,
+  context: { location: string },
+) {
+  const label = String(value)
+
+  return context.location === 'tick' ? label.slice(0, 4) : label
+}
+
 export default function RevenueTrendChart({
   data,
   height,
@@ -25,23 +38,27 @@ export default function RevenueTrendChart({
     <BaseMixedChart
       height={height}
       dataset={data}
+      barStroke="#f5a400"
       xAxis={{
         id: 'month',
         dataKey: 'label',
         scaleType: 'band',
-        valueFormatter: (value: string | number | Date) => String(value),
-        tickLabelInterval: (_, index) => index % 12 === 0,
+        tickInterval: isFirstMonthOfYear,
+        tickLabelInterval: isFirstMonthOfYear,
+        valueFormatter: formatMonthAxisLabel,
       }}
       yAxis={[
         {
           id: 'revenue',
           position: 'left',
+          width: 86,
           label: '千元',
           valueFormatter: (value: number) => formatNumber(value),
         },
         {
           id: 'growth',
           position: 'right',
+          width: 52,
           label: '%',
           valueFormatter: (value: number) => `${value.toFixed(1)}%`,
         },
@@ -52,7 +69,7 @@ export default function RevenueTrendChart({
           dataKey: 'revenue',
           yAxisId: 'revenue',
           label: '每月營收',
-          color: '#f5a400',
+          color: '#ffe08a',
           valueFormatter: (value: number | null) =>
             value === null ? '-' : `${formatNumber(value)} 千元`,
         },
