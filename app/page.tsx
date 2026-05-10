@@ -12,8 +12,9 @@ import RevenueTrendChart from './components/RevenueTrendChart'
 import StockAutocomplete from './components/StockAutocomplete'
 import usePersistedStockId from './hooks/usePersistedStockId'
 import type { RevenuePoint } from './interfaces/RevenuePoint'
+import { DEFAULT_STOCK_ID } from './constants/defaultStockId'
+import { formatNumber, formatPercent } from './utils/format'
 
-const defaultStockId = '2867'
 const revenueRangeOptions = [3, 5, 8] as const
 const revenueRangeMenuOptions = revenueRangeOptions.map((option) => ({
   label: `近 ${option} 年`,
@@ -21,14 +22,6 @@ const revenueRangeMenuOptions = revenueRangeOptions.map((option) => ({
 }))
 
 type RevenueRangeYear = (typeof revenueRangeOptions)[number]
-
-function formatNumber(value: number) {
-  return value.toLocaleString('en-US')
-}
-
-function formatPercent(value: number | null) {
-  return value === null ? '-' : value.toFixed(2)
-}
 
 function getTableMonthId(point: RevenuePoint) {
   return `${point.year}${String(point.month).padStart(2, '0')}`
@@ -88,7 +81,7 @@ export default function Home() {
     stockId: selectedStockId,
     isReady: isStockIdReady,
     setStockId: setSelectedStockId,
-  } = usePersistedStockId(defaultStockId)
+  } = usePersistedStockId(DEFAULT_STOCK_ID)
   const stocksQuery = useQuery(stocksQueryOptions())
   const revenueQuery = useQuery({
     ...revenueQueryOptions(selectedStockId),
