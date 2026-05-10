@@ -38,7 +38,8 @@ export default function BaseMixedChart({
   sx,
 }: BaseMixedChartProps) {
   const chartYAxis = yAxis.map((axis) => ({ ...axis, label: undefined }))
-  const [leftAxis, rightAxis] = yAxis
+  const leftAxis = yAxis.find((axis) => axis.position === 'left')
+  const rightAxis = yAxis.find((axis) => axis.position === 'right')
 
   return (
     <Box sx={{ position: 'relative' }}>

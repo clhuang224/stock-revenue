@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { Box, Checkbox, FormControlLabel } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import BaseMixedChart from './BaseMixedChart'
 
@@ -36,57 +38,98 @@ export default function RevenueTrendChart({
   height,
 }: RevenueTrendChartProps) {
   const theme = useTheme()
-
-  return (
-    <BaseMixedChart
-      height={height}
-      dataset={data}
-      barStroke={theme.palette.chart.revenue}
-      xAxis={{
-        id: 'month',
-        dataKey: 'label',
-        scaleType: 'band',
-        tickInterval: isFirstMonthOfYear,
-        tickLabelInterval: isFirstMonthOfYear,
-        valueFormatter: formatMonthAxisLabel,
-      }}
-      yAxis={[
-        {
-          id: 'revenue',
-          position: 'left',
-          width: 'auto',
-          label: '千元',
-          valueFormatter: (value: number) => formatNumber(value),
-        },
-        {
-          id: 'growth',
-          position: 'right',
-          width: 'auto',
-          label: '%',
-          valueFormatter: (value: number) => `${value.toFixed(1)}%`,
-        },
-      ]}
-      series={[
-        {
-          type: 'bar',
+  const [showRevenue, setShowRevenue] = useState(true)
+  const [showGrowth, setShowGrowth] = useState(true)
+  const yAxis = [
+    {
+      id: 'revenue',
+      position: 'left' as const,
+      width: 'auto' as const,
+      label: '千元',
+      valueFormatter: (value: number) => formatNumber(value),
+    },
+    {
+      id: 'growth',
+      position: 'right' as const,
+      width: 'auto' as const,
+      label: '%',
+      valueFormatter: (value: number) => `${value.toFixed(1)}%`,
+    },
+  ].filter((axis) =>
+    axis.id === 'revenue' ? showRevenue || !showGrowth : showGrowth,
+  )
+  const series = [
+    showRevenue
+      ? {
+          type: 'bar' as const,
           dataKey: 'revenue',
           yAxisId: 'revenue',
           label: '每月營收',
           color: theme.palette.chart.revenueSoft,
           valueFormatter: (value: number | null) =>
             value === null ? '-' : `${formatNumber(value)} 千元`,
-        },
-        {
-          type: 'line',
+        }
+      : null,
+    showGrowth
+      ? {
+          type: 'line' as const,
           dataKey: 'yoyGrowth',
           yAxisId: 'growth',
           label: '單月營收年增率 (%)',
           color: theme.palette.chart.growth,
-          curve: 'linear',
+          curve: 'linear' as const,
           valueFormatter: (value: number | null) =>
             value === null ? '-' : `${value.toFixed(2)}%`,
-        },
-      ]}
-    />
+        }
+      : null,
+  ].filter((item) => item !== null)
+
+  return (
+    <Box>
+      <BaseMixedChart
+        height={height}
+        dataset={data}
+        barStroke={theme.palette.chart.revenue}
+        xAxis={{
+          id: 'month',
+          dataKey: 'label',
+          scaleType: 'band',
+          tickInterval: isFirstMonthOfYear,
+          tickLabelInterval: isFirstMonthOfYear,
+          valueFormatter: formatMonthAxisLabel,
+        }}
+        yAxis={yAxis}
+        series={series}
+      />
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 1.5,
+          mt: 1,
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={showRevenue}
+              onChange={(event) => setShowRevenue(event.target.checked)}
+            />
+          }
+          label="每月營收"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={showGrowth}
+              onChange={(event) => setShowGrowth(event.target.checked)}
+            />
+          }
+          label="單月營收年增率(%)"
+        />
+      </Box>
+    </Box>
   )
 }
