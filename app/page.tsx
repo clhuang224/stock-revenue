@@ -10,6 +10,7 @@ import BaseTable from './components/BaseTable'
 import HomePanel from './components/home/HomePanel'
 import RevenueTrendChart from './components/RevenueTrendChart'
 import StockAutocomplete from './components/StockAutocomplete'
+import usePersistedStockId from './hooks/usePersistedStockId'
 import type { RevenuePoint } from './interfaces/RevenuePoint'
 
 const defaultStockId = '2867'
@@ -82,10 +83,17 @@ function filterRevenuePointsByYearRange(
 }
 
 export default function Home() {
-  const [selectedStockId, setSelectedStockId] = useState(defaultStockId)
   const [revenueRangeYear, setRevenueRangeYear] = useState<RevenueRangeYear>(5)
+  const {
+    stockId: selectedStockId,
+    isReady: isStockIdReady,
+    setStockId: setSelectedStockId,
+  } = usePersistedStockId(defaultStockId)
   const stocksQuery = useQuery(stocksQueryOptions())
-  const revenueQuery = useQuery(revenueQueryOptions(selectedStockId))
+  const revenueQuery = useQuery({
+    ...revenueQueryOptions(selectedStockId),
+    enabled: isStockIdReady,
+  })
   const stocks = stocksQuery.data ?? []
   const selectedStock =
     stocks.find((stock) => stock.stockId === selectedStockId) ?? null
@@ -97,6 +105,7 @@ export default function Home() {
   const tableColumns = buildTableColumns(filteredRevenuePoints)
   const tableRows = buildTableRows(filteredRevenuePoints)
   const hasRevenueData = filteredRevenuePoints.length > 0
+  const isRevenueLoading = !isStockIdReady || revenueQuery.isLoading
 
   return (
     <Box
@@ -127,7 +136,7 @@ export default function Home() {
           <StockAutocomplete
             options={stocks}
             value={selectedStock}
-            loading={stocksQuery.isLoading}
+            loading={stocksQuery.isLoading || !isStockIdReady}
             onChange={setSelectedStockId}
           />
         </Container>
@@ -149,7 +158,7 @@ export default function Home() {
           }}
         >
           <HomePanel
-            loading={stocksQuery.isLoading}
+            loading={stocksQuery.isLoading || !isStockIdReady}
             title={
               selectedStock
                 ? `${selectedStock.stockName} (${selectedStock.stockId})`
@@ -173,10 +182,10 @@ export default function Home() {
               <Typography sx={{ color: 'error.main' }}>
                 月營收資料載入失敗，請稍後再試。
               </Typography>
-            ) : revenueQuery.isLoading || hasRevenueData ? (
+            ) : isRevenueLoading || hasRevenueData ? (
               <RevenueTrendChart
                 data={filteredRevenuePoints}
-                loading={revenueQuery.isLoading}
+                loading={isRevenueLoading}
               />
             ) : (
               <Typography sx={{ color: 'text.secondary' }}>
@@ -190,9 +199,9 @@ export default function Home() {
               <Typography sx={{ color: 'error.main' }}>
                 詳細資料載入失敗，請稍後再試。
               </Typography>
-            ) : revenueQuery.isLoading || hasRevenueData ? (
+            ) : isRevenueLoading || hasRevenueData ? (
               <BaseTable
-                loading={revenueQuery.isLoading}
+                loading={isRevenueLoading}
                 firstColumnLabel="年度月份"
                 columns={tableColumns}
                 rows={tableRows}
