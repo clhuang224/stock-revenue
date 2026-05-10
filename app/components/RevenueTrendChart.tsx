@@ -54,14 +54,14 @@ export default function RevenueTrendChart({
         {
           id: 'revenue',
           position: 'left',
-          width: 86,
+          width: 'auto',
           label: '千元',
           valueFormatter: (value: number) => formatNumber(value),
         },
         {
           id: 'growth',
           position: 'right',
-          width: 52,
+          width: 'auto',
           label: '%',
           valueFormatter: (value: number) => `${value.toFixed(1)}%`,
         },
