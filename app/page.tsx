@@ -78,8 +78,14 @@ export default function Home() {
 
   return (
     <Box
-      component="main"
-      sx={{ minHeight: '100vh', bgcolor: 'background.default' }}
+      sx={{
+        height: '100dvh',
+        bgcolor: 'background.default',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+      }}
     >
       <Box
         component="header"
@@ -124,80 +130,87 @@ export default function Home() {
           />
         </Container>
       </Box>
-
-      <Container
-        maxWidth="md"
+      <Box
+        component="main"
         sx={{
-          py: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px',
+          overflowY: 'auto',
+          flex: 1,
         }}
       >
-        <HomePanel
-          title={
-            selectedStock
-              ? `${selectedStock.stockName} (${selectedStock.stockId})`
-              : selectedStockId
-          }
-        />
-
-        <HomePanel
-          leftAction={<Button variant="contained">每月營收</Button>}
-          rightAction={<Button variant="contained">近 5 年</Button>}
+        <Container
+          maxWidth="md"
+          sx={{
+            py: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
         >
-          {revenueQuery.isLoading ? (
-            <Typography sx={{ color: 'text.secondary' }}>
-              資料載入中...
-            </Typography>
-          ) : revenueQuery.isError ? (
-            <Typography sx={{ color: 'error.main' }}>
-              月營收資料載入失敗，請稍後再試。
-            </Typography>
-          ) : hasRevenueData ? (
-            <RevenueTrendChart data={revenuePoints} />
-          ) : (
-            <Typography sx={{ color: 'text.secondary' }}>
-              查無月營收資料。
-            </Typography>
-          )}
-        </HomePanel>
+          <HomePanel
+            title={
+              selectedStock
+                ? `${selectedStock.stockName} (${selectedStock.stockId})`
+                : selectedStockId
+            }
+          />
 
-        <HomePanel leftAction={<Button variant="contained">詳細數據</Button>}>
-          {revenueQuery.isLoading ? (
-            <Typography sx={{ color: 'text.secondary' }}>
-              資料載入中...
-            </Typography>
-          ) : revenueQuery.isError ? (
-            <Typography sx={{ color: 'error.main' }}>
-              詳細資料載入失敗，請稍後再試。
-            </Typography>
-          ) : hasRevenueData ? (
-            <BaseTable
-              firstColumnLabel="年度月份"
-              columns={tableColumns}
-              rows={tableRows}
-              minWidth={Math.max(760, 160 + tableColumns.length * 110)}
-            />
-          ) : (
-            <Typography sx={{ color: 'text.secondary' }}>
-              查無詳細資料。
-            </Typography>
-          )}
-        </HomePanel>
-
-        <Box sx={{ mt: 2.4, textAlign: 'center', color: 'text.secondary' }}>
-          <Typography variant="body2">
-            圖表單位：千元，數據來自公開資訊觀測站
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ mt: 0.6 }}
+          <HomePanel
+            leftAction={<Button variant="contained">每月營收</Button>}
+            rightAction={<Button variant="contained">近 5 年</Button>}
           >
-            資料來源：FinMind，原始資料來自公開資訊觀測站
-          </Typography>
-        </Box>
-      </Container>
+            {revenueQuery.isLoading ? (
+              <Typography sx={{ color: 'text.secondary' }}>
+                資料載入中...
+              </Typography>
+            ) : revenueQuery.isError ? (
+              <Typography sx={{ color: 'error.main' }}>
+                月營收資料載入失敗，請稍後再試。
+              </Typography>
+            ) : hasRevenueData ? (
+              <RevenueTrendChart data={revenuePoints} />
+            ) : (
+              <Typography sx={{ color: 'text.secondary' }}>
+                查無月營收資料。
+              </Typography>
+            )}
+          </HomePanel>
+
+          <HomePanel leftAction={<Button variant="contained">詳細數據</Button>}>
+            {revenueQuery.isLoading ? (
+              <Typography sx={{ color: 'text.secondary' }}>
+                資料載入中...
+              </Typography>
+            ) : revenueQuery.isError ? (
+              <Typography sx={{ color: 'error.main' }}>
+                詳細資料載入失敗，請稍後再試。
+              </Typography>
+            ) : hasRevenueData ? (
+              <BaseTable
+                firstColumnLabel="年度月份"
+                columns={tableColumns}
+                rows={tableRows}
+                minWidth={Math.max(760, 160 + tableColumns.length * 110)}
+              />
+            ) : (
+              <Typography sx={{ color: 'text.secondary' }}>
+                查無詳細資料。
+              </Typography>
+            )}
+          </HomePanel>
+
+          <Box sx={{ mt: 2.4, textAlign: 'center', color: 'text.secondary' }}>
+            <Typography variant="body2">
+              圖表單位：千元，數據來自公開資訊觀測站
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ mt: 0.6 }}
+            >
+              資料來源：FinMind，原始資料來自公開資訊觀測站
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
     </Box>
   )
 }

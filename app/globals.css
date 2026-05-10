@@ -12,6 +12,7 @@ body {
   margin: 0;
   background: var(--page-background);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow: hidden;
 }
 
 *,
