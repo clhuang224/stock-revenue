@@ -1,5 +1,6 @@
 'use client'
 
+import { useTheme } from '@mui/material/styles'
 import BaseMixedChart from './BaseMixedChart'
 
 export type RevenueTrendChartPoint = {
@@ -34,11 +35,13 @@ export default function RevenueTrendChart({
   data,
   height,
 }: RevenueTrendChartProps) {
+  const theme = useTheme()
+
   return (
     <BaseMixedChart
       height={height}
       dataset={data}
-      barStroke="#f5a400"
+      barStroke={theme.palette.chart.revenue}
       xAxis={{
         id: 'month',
         dataKey: 'label',
@@ -69,7 +72,7 @@ export default function RevenueTrendChart({
           dataKey: 'revenue',
           yAxisId: 'revenue',
           label: '每月營收',
-          color: '#ffe08a',
+          color: theme.palette.chart.revenueSoft,
           valueFormatter: (value: number | null) =>
             value === null ? '-' : `${formatNumber(value)} 千元`,
         },
@@ -78,7 +81,7 @@ export default function RevenueTrendChart({
           dataKey: 'yoyGrowth',
           yAxisId: 'growth',
           label: '單月營收年增率 (%)',
-          color: '#ef5350',
+          color: theme.palette.chart.growth,
           curve: 'linear',
           valueFormatter: (value: number | null) =>
             value === null ? '-' : `${value.toFixed(2)}%`,

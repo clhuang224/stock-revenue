@@ -18,11 +18,8 @@ export default function HomePanel({
 
   return (
     <Paper
-      variant="outlined"
       sx={{
         p: 2,
-        borderColor: 'var(--border)',
-        borderRadius: '4px',
       }}
     >
       {hasToolbar ? (
@@ -39,7 +36,7 @@ export default function HomePanel({
             {title ? (
               <Typography
                 component="h1"
-                sx={{ fontSize: 18, fontWeight: 600 }}
+                variant="h6"
               >
                 {title}
               </Typography>

@@ -1,15 +1,5 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
   --page-background: #eeeeee;
-  --surface: #ffffff;
-  --border: #d8dde3;
-  --grid-line: #e2e6eb;
-  --table-header: #f3f6f9;
-  --table-header-light: #f8fafc;
-  --chart-revenue: #f5a400;
-  --chart-revenue-soft: #ffd54f;
-  --chart-growth: #ef5350;
 }
 
 html {
@@ -21,7 +11,6 @@ body {
   min-height: 100vh;
   margin: 0;
   background: var(--page-background);
-  color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 

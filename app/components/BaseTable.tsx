@@ -39,8 +39,9 @@ export default function BaseTable({
       component={Box}
       sx={{
         overflowX: 'auto',
-        borderTop: '1px solid var(--border)',
-        borderLeft: '1px solid var(--border)',
+        borderTop: 1,
+        borderLeft: 1,
+        borderColor: 'divider',
       }}
     >
       <Table
@@ -53,9 +54,10 @@ export default function BaseTable({
               component="th"
               sx={{
                 width: firstColumnWidth,
-                bgcolor: 'var(--table-header)',
+                bgcolor: 'table.header',
                 fontWeight: 700,
-                borderRight: '1px solid var(--border)',
+                borderRight: 1,
+                borderColor: 'divider',
               }}
             >
               {firstColumnLabel}
@@ -65,9 +67,10 @@ export default function BaseTable({
                 key={column.id}
                 align="center"
                 sx={{
-                  bgcolor: 'var(--table-header-light)',
+                  bgcolor: 'table.headerLight',
                   fontWeight: 700,
-                  borderRight: '1px solid var(--border)',
+                  borderRight: 1,
+                  borderColor: 'divider',
                 }}
               >
                 {column.label}
@@ -79,9 +82,10 @@ export default function BaseTable({
               <TableCell
                 component="th"
                 sx={{
-                  bgcolor: 'var(--table-header)',
+                  bgcolor: 'table.header',
                   fontWeight: 700,
-                  borderRight: '1px solid var(--border)',
+                  borderRight: 1,
+                  borderColor: 'divider',
                   whiteSpace: 'nowrap',
                 }}
               >
@@ -92,7 +96,8 @@ export default function BaseTable({
                   key={`${row.id}-${column.id}`}
                   align="center"
                   sx={{
-                    borderRight: '1px solid var(--border)',
+                    borderRight: 1,
+                    borderColor: 'divider',
                     color: 'text.secondary',
                   }}
                 >

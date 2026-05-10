@@ -86,7 +86,8 @@ export default function Home() {
         sx={{
           height: 68,
           bgcolor: 'background.paper',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: 1,
+          borderColor: 'divider',
           display: 'flex',
           alignItems: 'center',
         }}
@@ -114,16 +115,11 @@ export default function Home() {
               <TextField
                 {...params}
                 placeholder="輸入台股代號或名稱，查看公司價值"
-                variant="outlined"
               />
             )}
             sx={{
               width: 390,
               mx: 'auto',
-              '& .MuiOutlinedInput-root': {
-                bgcolor: 'background.paper',
-                fontSize: 14,
-              },
             }}
           />
         </Container>
@@ -147,24 +143,8 @@ export default function Home() {
         />
 
         <HomePanel
-          leftAction={
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{ px: 2.2 }}
-            >
-              每月營收
-            </Button>
-          }
-          rightAction={
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{ px: 2.2 }}
-            >
-              近 5 年
-            </Button>
-          }
+          leftAction={<Button variant="contained">每月營收</Button>}
+          rightAction={<Button variant="contained">近 5 年</Button>}
         >
           {revenueQuery.isLoading ? (
             <Typography sx={{ color: 'text.secondary' }}>
@@ -183,17 +163,7 @@ export default function Home() {
           )}
         </HomePanel>
 
-        <HomePanel
-          leftAction={
-            <Button
-              variant="contained"
-              disableElevation
-              sx={{ px: 2.2 }}
-            >
-              詳細數據
-            </Button>
-          }
-        >
+        <HomePanel leftAction={<Button variant="contained">詳細數據</Button>}>
           {revenueQuery.isLoading ? (
             <Typography sx={{ color: 'text.secondary' }}>
               資料載入中...

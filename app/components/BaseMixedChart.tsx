@@ -113,17 +113,17 @@ export default function BaseMixedChart({
         sx={[
           {
             '& .MuiChartsAxis-line': {
-              stroke: 'var(--grid-line)',
+              stroke: 'divider',
             },
             '& .MuiChartsAxis-tick': {
-              stroke: 'var(--grid-line)',
+              stroke: 'divider',
             },
             '& .MuiChartsAxis-tickLabel': {
-              fill: 'var(--foreground)',
+              fill: 'text.primary',
               fontSize: 12,
             },
             '& .MuiChartsGrid-line': {
-              stroke: 'var(--grid-line)',
+              stroke: 'divider',
             },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
