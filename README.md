@@ -1,8 +1,12 @@
 # Stock Revenue
 
-一頁式台股月營收查詢工具。使用者可以搜尋台股股票，查看近 5 年每月營收、單月營收年增率圖表，以及對應的資料表。
+一頁式台股月營收查詢工具。使用者可以搜尋台股股票，查看近 3、5、8 年每月營收、單月營收年增率圖表，以及對應的資料表。
 
 專案使用 Next.js、TypeScript、MUI 與 FinMind API，並透過 server-side API proxy 保護資料服務 token。
+
+## Demo
+
+- Production: https://stock-revenue.lynns.me
 
 ## Features
 
@@ -16,6 +20,15 @@
 - 使用 MUI component library 並設定 theme。
 - 透過 Next.js server-side API proxy 保護 FinMind token。
 - 部署目標為 Vercel。
+
+## Technical Highlights
+
+- 使用 Next.js Route Handlers 作為 FinMind proxy，避免 API token 暴露到瀏覽器。
+- 將 FinMind 原始資料轉換成前端需要的 `StockOption` 與 `RevenuePoint`，讓 UI 不直接依賴外部 API schema。
+- 使用 TanStack Query 管理 client-side request、cache、loading 與 error state。
+- 針對股票清單與月營收設定 server response cache，降低 FinMind quota 壓力並提升切換股票時的互動速度。
+- 將 chart、table、autocomplete 的 loading skeleton 收在各自元件內，讓首頁維持資料流與頁面組裝的責任。
+- 透過 MUI theme 統一顏色、表格、按鈕與版面樣式。
 
 ## Tech Stack
 
@@ -52,8 +65,6 @@
 FINMIND_API_TOKEN=your_finmind_token
 ```
 
-不要使用 `NEXT_PUBLIC_FINMIND_API_TOKEN`。任何 `NEXT_PUBLIC_` 開頭的變數都會被打包到前端，使用者可以在瀏覽器看到。
-
 在 Vercel 部署時，請到 Project Settings 的 Environment Variables 加入：
 
 ```txt
@@ -66,6 +77,12 @@ FINMIND_API_TOKEN
 
 ```bash
 pnpm install
+```
+
+建立 `.env.local` 並加入：
+
+```bash
+FINMIND_API_TOKEN=your_finmind_token
 ```
 
 啟動開發伺服器：
@@ -89,7 +106,16 @@ http://localhost:3000
 | `pnpm run start`        | 啟動 production server          |
 | `pnpm run typecheck`    | 執行 TypeScript type check      |
 | `pnpm run lint`         | 執行 ESLint                     |
+| `pnpm run format`       | 使用 Prettier 格式化            |
 | `pnpm run format:check` | 檢查 Prettier 格式              |
+
+建議驗證流程：
+
+```bash
+pnpm run typecheck
+pnpm run lint
+pnpm run format:check
+```
 
 ## Architecture
 
@@ -119,6 +145,15 @@ Browser
 - `/api/revenue`: 月營收資料依股票代號快取，server response 與 TanStack Query cache 皆保留 1 小時。
 
 這樣使用者在後續切換股票時，已查詢過的股票資料可以直接從 cache 顯示，減少重複請求並提升互動效能。
+
+元件切分：
+
+- `app/page.tsx`: 首頁資料流、查詢狀態與版面組裝。
+- `StockAutocomplete`: 股票搜尋與 autocomplete loading skeleton。
+- `RevenueTrendChart`: 月營收圖表、series 切換與 chart loading skeleton。
+- `BaseTable`: 可水平捲動的資料表、sticky first column 與 table loading skeleton。
+- `BaseMenu`: 共用選單，目前用於切換圖表與表格的時間範圍。
+- `HomePanel`: 首頁白底區塊與標題 loading skeleton。
 
 ### Folder Structure
 
@@ -158,11 +193,17 @@ FINMIND_API_TOKEN
 
 Workflow：
 
-- pull request：安裝依賴並執行 `pnpm typecheck`、`pnpm lint`、`pnpm format:check`。
+- pull request：安裝依賴並執行 `pnpm run typecheck`、`pnpm run lint`、`pnpm run format:check`。
 - push 到 `main`：執行相同檢查，production deployment 由 Vercel Git Integration 處理。
+
+## Trade-offs
+
+- 目前以桌面版資料瀏覽體驗為主，手機版排版留待後續優化。
+- 股票狀態目前使用 `localStorage` 持久化，能延續個人使用情境；若要分享指定股票，可在後續加入 query string。
+- 圖表使用 MUI X Charts，優先保持與 MUI theme 的一致性；若未來需要更複雜的金融圖表互動，可再評估其他 chart library。
 
 ## Documentation
 
-詳細架構決策、component 切分與實作規劃請見：
+後續改進方向請見：
 
 - [`docs/plan.md`](docs/plan.md)
