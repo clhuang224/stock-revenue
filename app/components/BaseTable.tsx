@@ -9,6 +9,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  Typography,
 } from '@mui/material'
 
 export type BaseTableColumn = {
@@ -27,6 +28,10 @@ type BaseTableProps = {
   columns?: BaseTableColumn[]
   rows?: BaseTableRow[]
   loading?: boolean
+  error?: boolean
+  empty?: boolean
+  errorMessage?: string
+  emptyMessage?: string
   minWidth?: number
   firstColumnWidth?: number
   columnMinWidth?: number
@@ -37,6 +42,10 @@ export default function BaseTable({
   columns = [],
   rows = [],
   loading = false,
+  error = false,
+  empty = false,
+  errorMessage = '詳細資料載入失敗，請稍後再試。',
+  emptyMessage = '查無詳細資料。',
   minWidth = 760,
   firstColumnWidth = 160,
   columnMinWidth = 120,
@@ -85,6 +94,16 @@ export default function BaseTable({
       container.scrollLeft = container.scrollWidth
     }
   }, [displayColumns, displayRows])
+
+  if (!loading && error) {
+    return <Typography sx={{ color: 'error.main' }}>{errorMessage}</Typography>
+  }
+
+  if (!loading && empty) {
+    return (
+      <Typography sx={{ color: 'text.secondary' }}>{emptyMessage}</Typography>
+    )
+  }
 
   return (
     <TableContainer

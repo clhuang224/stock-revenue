@@ -1,7 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, Checkbox, FormControlLabel, Skeleton } from '@mui/material'
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Skeleton,
+  Typography,
+} from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import BaseMixedChart from './BaseMixedChart'
 
@@ -15,6 +21,10 @@ type RevenueTrendChartProps = {
   data: RevenueTrendChartPoint[]
   height?: number
   loading?: boolean
+  error?: boolean
+  empty?: boolean
+  errorMessage?: string
+  emptyMessage?: string
 }
 
 function formatNumber(value: number) {
@@ -38,6 +48,10 @@ export default function RevenueTrendChart({
   data,
   height,
   loading = false,
+  error = false,
+  empty = false,
+  errorMessage = '月營收資料載入失敗，請稍後再試。',
+  emptyMessage = '查無月營收資料。',
 }: RevenueTrendChartProps) {
   const theme = useTheme()
   const [showRevenue, setShowRevenue] = useState(true)
@@ -133,6 +147,16 @@ export default function RevenueTrendChart({
           />
         </Box>
       </Box>
+    )
+  }
+
+  if (error) {
+    return <Typography sx={{ color: 'error.main' }}>{errorMessage}</Typography>
+  }
+
+  if (empty) {
+    return (
+      <Typography sx={{ color: 'text.secondary' }}>{emptyMessage}</Typography>
     )
   }
 

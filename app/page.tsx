@@ -178,40 +178,24 @@ export default function Home() {
               />
             }
           >
-            {revenueQuery.isError ? (
-              <Typography sx={{ color: 'error.main' }}>
-                月營收資料載入失敗，請稍後再試。
-              </Typography>
-            ) : isRevenueLoading || hasRevenueData ? (
-              <RevenueTrendChart
-                data={filteredRevenuePoints}
-                loading={isRevenueLoading}
-              />
-            ) : (
-              <Typography sx={{ color: 'text.secondary' }}>
-                查無月營收資料。
-              </Typography>
-            )}
+            <RevenueTrendChart
+              data={filteredRevenuePoints}
+              loading={isRevenueLoading}
+              error={revenueQuery.isError}
+              empty={!isRevenueLoading && !hasRevenueData}
+            />
           </HomePanel>
 
           <HomePanel leftAction={<Button variant="contained">詳細數據</Button>}>
-            {revenueQuery.isError ? (
-              <Typography sx={{ color: 'error.main' }}>
-                詳細資料載入失敗，請稍後再試。
-              </Typography>
-            ) : isRevenueLoading || hasRevenueData ? (
-              <BaseTable
-                loading={isRevenueLoading}
-                firstColumnLabel="年度月份"
-                columns={tableColumns}
-                rows={tableRows}
-                minWidth={Math.max(760, 160 + tableColumns.length * 110)}
-              />
-            ) : (
-              <Typography sx={{ color: 'text.secondary' }}>
-                查無詳細資料。
-              </Typography>
-            )}
+            <BaseTable
+              loading={isRevenueLoading}
+              error={revenueQuery.isError}
+              empty={!isRevenueLoading && !hasRevenueData}
+              firstColumnLabel="年度月份"
+              columns={tableColumns}
+              rows={tableRows}
+              minWidth={Math.max(760, 160 + tableColumns.length * 110)}
+            />
           </HomePanel>
 
           <Box sx={{ mt: 2.4, textAlign: 'center', color: 'text.secondary' }}>
