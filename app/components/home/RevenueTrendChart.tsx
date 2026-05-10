@@ -9,8 +9,8 @@ import {
   Typography,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import BaseMixedChart from './BaseMixedChart'
-import { formatNumber } from '../utils/format'
+import BaseMixedChart from '../BaseMixedChart'
+import { formatNumber } from '../../utils/format'
 
 export type RevenueTrendChartPoint = {
   label: string

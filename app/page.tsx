@@ -10,8 +10,8 @@ import HomePanel from './components/home/HomePanel'
 import RevenueTimeRangeControl, {
   type RevenueTimeRange,
 } from './components/home/RevenueTimeRangeControl'
-import RevenueTrendChart from './components/RevenueTrendChart'
-import StockAutocomplete from './components/StockAutocomplete'
+import RevenueTrendChart from './components/home/RevenueTrendChart'
+import StockAutocomplete from './components/home/StockAutocomplete'
 import useRevenueSearchParams from './hooks/useRevenueSearchParams'
 import type { RevenuePoint } from './interfaces/RevenuePoint'
 import { formatNumber, formatPercent } from './utils/format'

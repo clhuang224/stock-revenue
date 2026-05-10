@@ -1,7 +1,7 @@
 'use client'
 
 import { Autocomplete, Skeleton, TextField } from '@mui/material'
-import type { StockOption } from '../interfaces/StockOption'
+import type { StockOption } from '../../interfaces/StockOption'
 
 type StockAutocompleteProps = {
   options: StockOption[]
