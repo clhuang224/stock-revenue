@@ -8,6 +8,7 @@ import type {
 import type { TimeType } from '../../types/TimeType'
 
 const REVENUE_CACHE_SECONDS = 60 * 60
+const MAX_REVENUE_YEARS = 8
 
 function formatDate(date: Date): TimeType {
   const year = date.getFullYear()
@@ -21,7 +22,7 @@ function getRevenueDateRange() {
   const endDate = new Date()
   const startDate = new Date(endDate)
 
-  startDate.setFullYear(startDate.getFullYear() - 6)
+  startDate.setFullYear(startDate.getFullYear() - (MAX_REVENUE_YEARS + 1))
   startDate.setMonth(0, 1)
 
   return {
@@ -52,12 +53,12 @@ export async function GET(request: NextRequest) {
     } satisfies TaiwanStockMonthRevenueQuery
     const revenueRecords =
       await fetchFinMindData<TaiwanStockMonthRevenueResponse>(revenueQuery)
-    const fiveYearsAgo = new Date()
-    fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5)
-    fiveYearsAgo.setMonth(0, 1)
+    const maxYearsAgo = new Date()
+    maxYearsAgo.setFullYear(maxYearsAgo.getFullYear() - MAX_REVENUE_YEARS)
+    maxYearsAgo.setMonth(0, 1)
 
     const revenuePoints = mapRevenuePoints(revenueRecords).filter(
-      (point) => new Date(point.date) >= fiveYearsAgo,
+      (point) => new Date(point.date) >= maxYearsAgo,
     )
 
     return Response.json(

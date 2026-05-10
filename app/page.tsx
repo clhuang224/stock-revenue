@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import { revenueQueryOptions } from './apis/revenue'
 import { stocksQueryOptions } from './apis/stocks'
+import BaseMenu from './components/BaseMenu'
 import BaseTable from './components/BaseTable'
 import HomePanel from './components/home/HomePanel'
 import RevenueTrendChart from './components/RevenueTrendChart'
@@ -19,6 +20,13 @@ import type { RevenuePoint } from './interfaces/RevenuePoint'
 import type { StockOption } from './interfaces/StockOption'
 
 const defaultStockId = '2867'
+const revenueRangeOptions = [3, 5, 8] as const
+const revenueRangeMenuOptions = revenueRangeOptions.map((option) => ({
+  label: `近 ${option} 年`,
+  value: option,
+}))
+
+type RevenueRangeYear = (typeof revenueRangeOptions)[number]
 
 function formatNumber(value: number) {
   return value.toLocaleString('en-US')
@@ -64,17 +72,38 @@ function buildTableRows(revenuePoints: RevenuePoint[]) {
   ]
 }
 
+function filterRevenuePointsByYearRange(
+  revenuePoints: RevenuePoint[],
+  yearRange: RevenueRangeYear,
+) {
+  const latestPoint = revenuePoints.at(-1)
+
+  if (!latestPoint) {
+    return []
+  }
+
+  const startDate = new Date(latestPoint.date)
+  startDate.setFullYear(startDate.getFullYear() - yearRange)
+
+  return revenuePoints.filter((point) => new Date(point.date) >= startDate)
+}
+
 export default function Home() {
   const [selectedStockId, setSelectedStockId] = useState(defaultStockId)
+  const [revenueRangeYear, setRevenueRangeYear] = useState<RevenueRangeYear>(5)
   const stocksQuery = useQuery(stocksQueryOptions())
   const revenueQuery = useQuery(revenueQueryOptions(selectedStockId))
   const stocks = stocksQuery.data ?? []
   const selectedStock =
     stocks.find((stock) => stock.stockId === selectedStockId) ?? null
   const revenuePoints = revenueQuery.data ?? []
-  const tableColumns = buildTableColumns(revenuePoints)
-  const tableRows = buildTableRows(revenuePoints)
-  const hasRevenueData = revenuePoints.length > 0
+  const filteredRevenuePoints = filterRevenuePointsByYearRange(
+    revenuePoints,
+    revenueRangeYear,
+  )
+  const tableColumns = buildTableColumns(filteredRevenuePoints)
+  const tableRows = buildTableRows(filteredRevenuePoints)
+  const hasRevenueData = filteredRevenuePoints.length > 0
 
   return (
     <Box
@@ -156,7 +185,15 @@ export default function Home() {
 
           <HomePanel
             leftAction={<Button variant="contained">每月營收</Button>}
-            rightAction={<Button variant="contained">近 5 年</Button>}
+            rightAction={
+              <BaseMenu
+                id="revenue-range-menu"
+                label={`近 ${revenueRangeYear} 年`}
+                options={revenueRangeMenuOptions}
+                value={revenueRangeYear}
+                onChange={setRevenueRangeYear}
+              />
+            }
           >
             {revenueQuery.isLoading ? (
               <Typography sx={{ color: 'text.secondary' }}>
@@ -167,7 +204,7 @@ export default function Home() {
                 月營收資料載入失敗，請稍後再試。
               </Typography>
             ) : hasRevenueData ? (
-              <RevenueTrendChart data={revenuePoints} />
+              <RevenueTrendChart data={filteredRevenuePoints} />
             ) : (
               <Typography sx={{ color: 'text.secondary' }}>
                 查無月營收資料。
