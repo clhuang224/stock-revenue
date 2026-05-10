@@ -34,7 +34,7 @@ export default function BaseMixedChart({
   yAxis,
   series,
   barStroke,
-  height = 420,
+  height = 350,
   sx,
 }: BaseMixedChartProps) {
   const chartYAxis = yAxis.map((axis) => ({ ...axis, label: undefined }))
@@ -107,7 +107,7 @@ export default function BaseMixedChart({
       <ChartsContainer
         height={height}
         dataset={dataset}
-        margin={{ top: 32, right: 8, bottom: 24, left: 8 }}
+        margin={{ top: 40, right: 0, bottom: 8, left: 0 }}
         xAxis={[xAxis]}
         yAxis={chartYAxis}
         series={series}
