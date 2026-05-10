@@ -69,7 +69,7 @@ export default function RevenueTrendChart({
       position: 'right' as const,
       width: 'auto' as const,
       label: '%',
-      valueFormatter: (value: number) => `${value.toFixed(1)}%`,
+      valueFormatter: (value: number) => value.toFixed(0),
     },
   ].filter((axis) =>
     axis.id === 'revenue' ? showRevenue || !showGrowth : showGrowth,
