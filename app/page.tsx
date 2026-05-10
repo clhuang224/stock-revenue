@@ -3,25 +3,20 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Button, Container, Typography } from '@mui/material'
+import { isWithinInterval } from 'date-fns'
 import { revenueQueryOptions } from './apis/revenue'
 import { stocksQueryOptions } from './apis/stocks'
-import BaseMenu from './components/BaseMenu'
 import BaseTable from './components/BaseTable'
 import HomePanel from './components/home/HomePanel'
+import RevenueTimeRangeControl, {
+  type RevenueTimeRange,
+} from './components/home/RevenueTimeRangeControl'
 import RevenueTrendChart from './components/RevenueTrendChart'
 import StockAutocomplete from './components/StockAutocomplete'
 import usePersistedStockId from './hooks/usePersistedStockId'
 import type { RevenuePoint } from './interfaces/RevenuePoint'
 import { DEFAULT_STOCK_ID } from './constants/defaultStockId'
 import { formatNumber, formatPercent } from './utils/format'
-
-const revenueRangeOptions = [3, 5, 8] as const
-const revenueRangeMenuOptions = revenueRangeOptions.map((option) => ({
-  label: `近 ${option} 年`,
-  value: option,
-}))
-
-type RevenueRangeYear = (typeof revenueRangeOptions)[number]
 
 function getTableMonthId(point: RevenuePoint) {
   return `${point.year}${String(point.month).padStart(2, '0')}`
@@ -59,24 +54,21 @@ function buildTableRows(revenuePoints: RevenuePoint[]) {
   ]
 }
 
-function filterRevenuePointsByYearRange(
+function filterRevenuePointsByDateRange(
   revenuePoints: RevenuePoint[],
-  yearRange: RevenueRangeYear,
+  dateRange: RevenueTimeRange,
 ) {
-  const latestPoint = revenuePoints.at(-1)
-
-  if (!latestPoint) {
-    return []
-  }
-
-  const startDate = new Date(latestPoint.date)
-  startDate.setFullYear(startDate.getFullYear() - yearRange)
-
-  return revenuePoints.filter((point) => new Date(point.date) >= startDate)
+  return revenuePoints.filter((point) =>
+    isWithinInterval(new Date(point.date), {
+      start: dateRange.startDate,
+      end: dateRange.endDate,
+    }),
+  )
 }
 
 export default function Home() {
-  const [revenueRangeYear, setRevenueRangeYear] = useState<RevenueRangeYear>(5)
+  const [revenueTimeRange, setRevenueTimeRange] =
+    useState<RevenueTimeRange | null>(null)
   const {
     stockId: selectedStockId,
     isReady: isStockIdReady,
@@ -91,14 +83,16 @@ export default function Home() {
   const selectedStock =
     stocks.find((stock) => stock.stockId === selectedStockId) ?? null
   const revenuePoints = revenueQuery.data ?? []
-  const filteredRevenuePoints = filterRevenuePointsByYearRange(
-    revenuePoints,
-    revenueRangeYear,
-  )
+  const filteredRevenuePoints = revenueTimeRange
+    ? filterRevenuePointsByDateRange(revenuePoints, revenueTimeRange)
+    : []
   const tableColumns = buildTableColumns(filteredRevenuePoints)
   const tableRows = buildTableRows(filteredRevenuePoints)
+  const hasRawRevenueData = revenuePoints.length > 0
   const hasRevenueData = filteredRevenuePoints.length > 0
   const isRevenueLoading = !isStockIdReady || revenueQuery.isLoading
+  const isTimeRangeLoading = hasRawRevenueData && !revenueTimeRange
+  const isRevenueDataLoading = isRevenueLoading || isTimeRangeLoading
 
   return (
     <Box
@@ -162,28 +156,26 @@ export default function Home() {
           <HomePanel
             leftAction={<Button variant="contained">每月營收</Button>}
             rightAction={
-              <BaseMenu
-                id="revenue-range-menu"
-                label={`近 ${revenueRangeYear} 年`}
-                options={revenueRangeMenuOptions}
-                value={revenueRangeYear}
-                onChange={setRevenueRangeYear}
+              <RevenueTimeRangeControl
+                value={revenueTimeRange}
+                maxDate={new Date()}
+                onChange={setRevenueTimeRange}
               />
             }
           >
             <RevenueTrendChart
               data={filteredRevenuePoints}
-              loading={isRevenueLoading}
+              loading={isRevenueDataLoading}
               error={revenueQuery.isError}
-              empty={!isRevenueLoading && !hasRevenueData}
+              empty={!isRevenueDataLoading && !hasRevenueData}
             />
           </HomePanel>
 
           <HomePanel leftAction={<Button variant="contained">詳細數據</Button>}>
             <BaseTable
-              loading={isRevenueLoading}
+              loading={isRevenueDataLoading}
               error={revenueQuery.isError}
-              empty={!isRevenueLoading && !hasRevenueData}
+              empty={!isRevenueDataLoading && !hasRevenueData}
               firstColumnLabel="年度月份"
               columns={tableColumns}
               rows={tableRows}

@@ -5,30 +5,13 @@ import type {
   TaiwanStockMonthRevenueQuery,
   TaiwanStockMonthRevenueResponse,
 } from '../../interfaces/TaiwanStockMonthRevenue'
-import type { TimeType } from '../../types/TimeType'
+import { createRecentDateRange, formatFinMindDate } from '../../utils/date'
 
 const REVENUE_CACHE_SECONDS = 60 * 60
 const MAX_REVENUE_YEARS = 8
 
-function formatDate(date: Date): TimeType {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}` as TimeType
-}
-
 function getRevenueDateRange() {
-  const endDate = new Date()
-  const startDate = new Date(endDate)
-
-  startDate.setFullYear(startDate.getFullYear() - (MAX_REVENUE_YEARS + 1))
-  startDate.setMonth(0, 1)
-
-  return {
-    startDate: formatDate(startDate),
-    endDate: formatDate(endDate),
-  }
+  return createRecentDateRange((MAX_REVENUE_YEARS + 1) * 12)
 }
 
 function isValidStockId(stockId: string) {
@@ -48,17 +31,15 @@ export async function GET(request: NextRequest) {
     const revenueQuery = {
       dataset: 'TaiwanStockMonthRevenue',
       data_id: stockId,
-      start_date: startDate,
-      end_date: endDate,
+      start_date: formatFinMindDate(startDate),
+      end_date: formatFinMindDate(endDate),
     } satisfies TaiwanStockMonthRevenueQuery
     const revenueRecords =
       await fetchFinMindData<TaiwanStockMonthRevenueResponse>(revenueQuery)
-    const maxYearsAgo = new Date()
-    maxYearsAgo.setFullYear(maxYearsAgo.getFullYear() - MAX_REVENUE_YEARS)
-    maxYearsAgo.setMonth(0, 1)
+    const visibleDateRange = createRecentDateRange(MAX_REVENUE_YEARS * 12)
 
     const revenuePoints = mapRevenuePoints(revenueRecords).filter(
-      (point) => new Date(point.date) >= maxYearsAgo,
+      (point) => new Date(point.date) >= visibleDateRange.startDate,
     )
 
     return Response.json(
