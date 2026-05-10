@@ -7,6 +7,8 @@ import type {
 } from '../../interfaces/TaiwanStockMonthRevenue'
 import type { TimeType } from '../../types/TimeType'
 
+const REVENUE_CACHE_SECONDS = 60 * 60
+
 function formatDate(date: Date): TimeType {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -58,10 +60,17 @@ export async function GET(request: NextRequest) {
       (point) => new Date(point.date) >= fiveYearsAgo,
     )
 
-    return Response.json({
-      stock: { stockId },
-      data: revenuePoints,
-    })
+    return Response.json(
+      {
+        stock: { stockId },
+        data: revenuePoints,
+      },
+      {
+        headers: {
+          'Cache-Control': `public, s-maxage=${REVENUE_CACHE_SECONDS}, stale-while-revalidate=${REVENUE_CACHE_SECONDS}`,
+        },
+      },
+    )
   } catch (error) {
     const status = error instanceof FinMindApiError ? error.status : 500
 

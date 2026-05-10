@@ -25,5 +25,6 @@ export function revenueQueryOptions(stockId: string) {
     queryFn: () => fetchRevenue(stockId),
     enabled: Boolean(stockId),
     staleTime: 60 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
 }

@@ -110,6 +110,13 @@ Browser
 
 前端資料請求集中在 `app/apis/stocks.ts` 與 `app/apis/revenue.ts`，並透過 TanStack Query 管理 cache、loading 與 error state。
 
+快取策略：
+
+- `/api/stocks`: 股票清單變動頻率低，server response 與 TanStack Query cache 皆保留 24 小時。
+- `/api/revenue`: 月營收資料依股票代號快取，server response 與 TanStack Query cache 皆保留 1 小時。
+
+這樣使用者在後續切換股票時，已查詢過的股票資料可以直接從 cache 顯示，減少重複請求並提升互動效能。
+
 ### Folder Structure
 
 ```txt

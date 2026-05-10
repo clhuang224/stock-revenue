@@ -22,5 +22,6 @@ export function stocksQueryOptions() {
     queryKey: stockQueryKeys.all,
     queryFn: fetchStocks,
     staleTime: 24 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
   })
 }
