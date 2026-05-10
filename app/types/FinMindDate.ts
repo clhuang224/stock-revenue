@@ -45,4 +45,4 @@ type DateString =
   | '30'
   | '31'
 
-export type TimeType = `${number}-${MonthString}-${DateString}`
+export type FinMindDate = `${number}-${MonthString}-${DateString}`

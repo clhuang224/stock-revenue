@@ -1,5 +1,5 @@
 import { endOfDay, format, startOfDay, startOfMonth, subMonths } from 'date-fns'
-import type { TimeType } from '../types/TimeType'
+import type { FinMindDate } from '../types/FinMindDate'
 
 export type DateRange = {
   startDate: Date
@@ -30,6 +30,6 @@ export function createWithinDateRange(
   }
 }
 
-export function formatFinMindDate(date: Date): TimeType {
-  return format(date, 'yyyy-MM-dd') as TimeType
+export function formatFinMindDate(date: Date): FinMindDate {
+  return format(date, 'yyyy-MM-dd') as FinMindDate
 }

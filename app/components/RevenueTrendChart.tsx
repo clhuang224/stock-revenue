@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import BaseMixedChart from './BaseMixedChart'
+import { formatNumber } from '../utils/format'
 
 export type RevenueTrendChartPoint = {
   label: string
@@ -25,10 +26,6 @@ type RevenueTrendChartProps = {
   empty?: boolean
   errorMessage?: string
   emptyMessage?: string
-}
-
-function formatNumber(value: number) {
-  return value.toLocaleString('en-US')
 }
 
 function isFirstMonthOfYear(value: string | number | Date) {

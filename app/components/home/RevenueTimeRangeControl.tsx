@@ -12,6 +12,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import type { DateValidationError } from '@mui/x-date-pickers/models'
 import {
   endOfDay,
   endOfMonth,
@@ -32,6 +33,8 @@ export type RevenueTimeRange = DateRange
 
 const CUSTOM_OPTION_VALUE = 'custom' as const
 const CUSTOM_OPTION_LABEL = '自訂' as const
+const maxRevenueMonthCount =
+  timeRangePresetMapMonthCount[TimeRangePreset.EIGHT_YEARS]
 
 type DraftDateRange = {
   startDate?: Date | null
@@ -69,6 +72,10 @@ function getDateRangeFromPreset(
 
 function getDefaultCustomRange(): RevenueTimeRange {
   return createRecentDateRange(12)
+}
+
+function getMinSelectableDate() {
+  return startOfMonth(createRecentDateRange(maxRevenueMonthCount).startDate)
 }
 
 function normalizeStartDate(value: Date | null) {
@@ -122,6 +129,9 @@ export default function RevenueTimeRangeControl({
     defaultTimeRangePreset,
   )
   const [isCustomDialogOpen, setIsCustomDialogOpen] = useState(false)
+  const [startDateError, setStartDateError] =
+    useState<DateValidationError>(null)
+  const [endDateError, setEndDateError] = useState<DateValidationError>(null)
   const [draftCustomRange, setDraftCustomRange] = useState<DraftDateRange>(
     getDraftDateRange(value ?? getDefaultCustomRange()),
   )
@@ -149,6 +159,8 @@ export default function RevenueTimeRangeControl({
       setDraftCustomRange(
         value ? getDraftDateRange(value) : getDefaultCustomRange(),
       )
+      setStartDateError(null)
+      setEndDateError(null)
       setIsCustomDialogOpen(true)
 
       return
@@ -191,8 +203,10 @@ export default function RevenueTimeRangeControl({
     setIsCustomDialogOpen(false)
   }
 
+  const hasCustomRangeError = Boolean(startDateError || endDateError)
+
   function handleApplyCustomRange() {
-    if (!isCompleteDateRange(draftCustomRange)) {
+    if (!isCompleteDateRange(draftCustomRange) || hasCustomRangeError) {
       return
     }
 
@@ -230,8 +244,10 @@ export default function RevenueTimeRangeControl({
               openTo="month"
               format="yyyy/MM"
               value={draftCustomRange.startDate ?? null}
+              minDate={getMinSelectableDate()}
               maxDate={draftCustomRange.endDate ?? maxDate}
               onChange={handleStartMonthChange}
+              onError={setStartDateError}
               slotProps={{
                 textField: {
                   size: 'small',
@@ -245,9 +261,10 @@ export default function RevenueTimeRangeControl({
               openTo="month"
               format="yyyy/MM"
               value={draftCustomRange.endDate ?? null}
-              minDate={draftCustomRange.startDate ?? undefined}
+              minDate={draftCustomRange.startDate ?? getMinSelectableDate()}
               maxDate={maxDate}
               onChange={handleEndMonthChange}
+              onError={setEndDateError}
               slotProps={{
                 textField: {
                   size: 'small',
@@ -266,7 +283,9 @@ export default function RevenueTimeRangeControl({
             <Button
               variant="contained"
               disabled={
-                !draftCustomRange.startDate || !draftCustomRange.endDate
+                !draftCustomRange.startDate ||
+                !draftCustomRange.endDate ||
+                hasCustomRangeError
               }
               onClick={handleApplyCustomRange}
             >
