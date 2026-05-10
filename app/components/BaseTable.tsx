@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import {
   Box,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -23,8 +24,9 @@ export type BaseTableRow = {
 
 type BaseTableProps = {
   firstColumnLabel: ReactNode
-  columns: BaseTableColumn[]
-  rows: BaseTableRow[]
+  columns?: BaseTableColumn[]
+  rows?: BaseTableRow[]
+  loading?: boolean
   minWidth?: number
   firstColumnWidth?: number
   columnMinWidth?: number
@@ -32,13 +34,49 @@ type BaseTableProps = {
 
 export default function BaseTable({
   firstColumnLabel,
-  columns,
-  rows,
+  columns = [],
+  rows = [],
+  loading = false,
   minWidth = 760,
   firstColumnWidth = 160,
   columnMinWidth = 120,
 }: BaseTableProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const displayColumns = loading
+    ? Array.from({ length: 5 }, (_, index) => ({
+        id: `loading-column-${index}`,
+        label: (
+          <Skeleton
+            variant="text"
+            width={80}
+            height={22}
+          />
+        ),
+      }))
+    : columns
+  const displayRows = loading
+    ? Array.from({ length: 2 }, (_, index) => ({
+        id: `loading-row-${index}`,
+        label: (
+          <Skeleton
+            variant="text"
+            width={92}
+            height={22}
+          />
+        ),
+        cells: Object.fromEntries(
+          displayColumns.map((column) => [
+            column.id,
+            <Skeleton
+              key={column.id}
+              variant="text"
+              width={80}
+              height={22}
+            />,
+          ]),
+        ),
+      }))
+    : rows
 
   useEffect(() => {
     const container = containerRef.current
@@ -46,7 +84,7 @@ export default function BaseTable({
     if (container) {
       container.scrollLeft = container.scrollWidth
     }
-  }, [columns, rows])
+  }, [displayColumns, displayRows])
 
   return (
     <TableContainer
@@ -82,16 +120,24 @@ export default function BaseTable({
                 zIndex: 2,
               }}
             >
-              {firstColumnLabel}
+              {loading ? (
+                <Skeleton
+                  variant="text"
+                  width={92}
+                  height={22}
+                />
+              ) : (
+                firstColumnLabel
+              )}
             </TableCell>
-            {columns.map((column, index) => (
+            {displayColumns.map((column, index) => (
               <TableCell
                 key={column.id}
                 align="center"
                 sx={{
                   bgcolor: 'table.headerLight',
                   fontWeight: 700,
-                  borderRight: index === columns.length - 1 ? 0 : 1,
+                  borderRight: index === displayColumns.length - 1 ? 0 : 1,
                   borderColor: 'divider',
                   minWidth: columnMinWidth,
                   whiteSpace: 'nowrap',
@@ -101,7 +147,7 @@ export default function BaseTable({
               </TableCell>
             ))}
           </TableRow>
-          {rows.map((row) => (
+          {displayRows.map((row) => (
             <TableRow key={row.id}>
               <TableCell
                 component="th"
@@ -121,12 +167,12 @@ export default function BaseTable({
               >
                 {row.label}
               </TableCell>
-              {columns.map((column, index) => (
+              {displayColumns.map((column, index) => (
                 <TableCell
                   key={`${row.id}-${column.id}`}
                   align="center"
                   sx={{
-                    borderRight: index === columns.length - 1 ? 0 : 1,
+                    borderRight: index === displayColumns.length - 1 ? 0 : 1,
                     borderColor: 'divider',
                     color: 'text.secondary',
                     minWidth: columnMinWidth,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, Checkbox, FormControlLabel } from '@mui/material'
+import { Box, Checkbox, FormControlLabel, Skeleton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import BaseMixedChart from './BaseMixedChart'
 
@@ -14,6 +14,7 @@ export type RevenueTrendChartPoint = {
 type RevenueTrendChartProps = {
   data: RevenueTrendChartPoint[]
   height?: number
+  loading?: boolean
 }
 
 function formatNumber(value: number) {
@@ -36,6 +37,7 @@ function formatMonthAxisLabel(
 export default function RevenueTrendChart({
   data,
   height,
+  loading = false,
 }: RevenueTrendChartProps) {
   const theme = useTheme()
   const [showRevenue, setShowRevenue] = useState(true)
@@ -83,6 +85,56 @@ export default function RevenueTrendChart({
         }
       : null,
   ].filter((item) => item !== null)
+
+  if (loading) {
+    return (
+      <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 1,
+          }}
+        >
+          <Skeleton
+            variant="text"
+            width={180}
+            height={24}
+          />
+          <Skeleton
+            variant="text"
+            width={28}
+            height={24}
+          />
+        </Box>
+        <Skeleton
+          variant="rounded"
+          height={height ?? 420}
+          sx={{ width: '100%' }}
+        />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 1.5,
+            mt: 1,
+          }}
+        >
+          <Skeleton
+            variant="rounded"
+            width={96}
+            height={28}
+          />
+          <Skeleton
+            variant="rounded"
+            width={168}
+            height={28}
+          />
+        </Box>
+      </Box>
+    )
+  }
 
   return (
     <Box>

@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
-import { Box, Paper, Typography } from '@mui/material'
+import { Box, Paper, Skeleton, Typography } from '@mui/material'
 
 type HomePanelProps = {
   title?: ReactNode
+  loading?: boolean
   leftAction?: ReactNode
   rightAction?: ReactNode
   children?: ReactNode
@@ -10,11 +11,12 @@ type HomePanelProps = {
 
 export default function HomePanel({
   title,
+  loading = false,
   leftAction,
   rightAction,
   children,
 }: HomePanelProps) {
-  const hasToolbar = title || leftAction || rightAction
+  const hasToolbar = loading || title || leftAction || rightAction
 
   return (
     <Paper
@@ -33,7 +35,14 @@ export default function HomePanel({
           }}
         >
           <Box sx={{ minWidth: 0 }}>
-            {title ? (
+            {loading ? (
+              <Skeleton
+                variant="text"
+                width={170}
+                height={26}
+                sx={{ fontSize: 18 }}
+              />
+            ) : title ? (
               <Typography
                 component="h1"
                 variant="h6"

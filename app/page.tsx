@@ -2,22 +2,15 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Container,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Box, Button, Container, Typography } from '@mui/material'
 import { revenueQueryOptions } from './apis/revenue'
 import { stocksQueryOptions } from './apis/stocks'
 import BaseMenu from './components/BaseMenu'
 import BaseTable from './components/BaseTable'
 import HomePanel from './components/home/HomePanel'
 import RevenueTrendChart from './components/RevenueTrendChart'
+import StockAutocomplete from './components/StockAutocomplete'
 import type { RevenuePoint } from './interfaces/RevenuePoint'
-import type { StockOption } from './interfaces/StockOption'
 
 const defaultStockId = '2867'
 const revenueRangeOptions = [3, 5, 8] as const
@@ -131,31 +124,11 @@ export default function Home() {
           maxWidth={false}
           sx={{ maxWidth: 1280 }}
         >
-          <Autocomplete
-            size="small"
+          <StockAutocomplete
             options={stocks}
             value={selectedStock}
             loading={stocksQuery.isLoading}
-            getOptionKey={(option) => option.stockId}
-            getOptionLabel={(option) => `${option.stockId} ${option.stockName}`}
-            isOptionEqualToValue={(option, value) =>
-              option.stockId === value.stockId
-            }
-            onChange={(_, option: StockOption | null) => {
-              if (option) {
-                setSelectedStockId(option.stockId)
-              }
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="輸入台股代號或名稱，查看公司價值"
-              />
-            )}
-            sx={{
-              width: 390,
-              mx: 'auto',
-            }}
+            onChange={setSelectedStockId}
           />
         </Container>
       </Box>
@@ -176,6 +149,7 @@ export default function Home() {
           }}
         >
           <HomePanel
+            loading={stocksQuery.isLoading}
             title={
               selectedStock
                 ? `${selectedStock.stockName} (${selectedStock.stockId})`
@@ -195,16 +169,15 @@ export default function Home() {
               />
             }
           >
-            {revenueQuery.isLoading ? (
-              <Typography sx={{ color: 'text.secondary' }}>
-                資料載入中...
-              </Typography>
-            ) : revenueQuery.isError ? (
+            {revenueQuery.isError ? (
               <Typography sx={{ color: 'error.main' }}>
                 月營收資料載入失敗，請稍後再試。
               </Typography>
-            ) : hasRevenueData ? (
-              <RevenueTrendChart data={filteredRevenuePoints} />
+            ) : revenueQuery.isLoading || hasRevenueData ? (
+              <RevenueTrendChart
+                data={filteredRevenuePoints}
+                loading={revenueQuery.isLoading}
+              />
             ) : (
               <Typography sx={{ color: 'text.secondary' }}>
                 查無月營收資料。
@@ -213,16 +186,13 @@ export default function Home() {
           </HomePanel>
 
           <HomePanel leftAction={<Button variant="contained">詳細數據</Button>}>
-            {revenueQuery.isLoading ? (
-              <Typography sx={{ color: 'text.secondary' }}>
-                資料載入中...
-              </Typography>
-            ) : revenueQuery.isError ? (
+            {revenueQuery.isError ? (
               <Typography sx={{ color: 'error.main' }}>
                 詳細資料載入失敗，請稍後再試。
               </Typography>
-            ) : hasRevenueData ? (
+            ) : revenueQuery.isLoading || hasRevenueData ? (
               <BaseTable
+                loading={revenueQuery.isLoading}
                 firstColumnLabel="年度月份"
                 columns={tableColumns}
                 rows={tableRows}
