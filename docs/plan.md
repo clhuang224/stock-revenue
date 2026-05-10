@@ -12,18 +12,12 @@
 - 顯示目前股票名稱與代號。
 - 顯示近 3、5、8 年月營收與單月營收年增率圖表。
 - 顯示月營收明細表，並預設定位到最新月份。
-- 透過 `localStorage` 記住上次選擇的股票。
+- 透過 query string 分享股票與時間區間，例如 `/?stock=2330&start_at=1609430400000&end_at=1778428799999`。
 - 使用 TanStack Query 與 server response cache 減少重複請求。
 - 透過 Next.js Route Handlers 代理 FinMind API，避免 token 暴露在瀏覽器。
 - 使用 Vercel Git Integration 部署，GitHub Actions 負責檢查。
 
 ## Next Improvements
-
-### Shareable State
-
-- 評估是否加入 query string，例如 `/?stock=2330&range=5`。
-- 目標是讓使用者能分享目前股票與時間範圍。
-- 若加入 query string，需要決定與 `localStorage` 的優先順序。
 
 ### Responsive Layout
 

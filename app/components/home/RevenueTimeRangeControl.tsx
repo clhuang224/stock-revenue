@@ -120,14 +120,23 @@ function isSameDateRange(
   )
 }
 
+function getMatchingTimeRangePreset(value: RevenueTimeRange | null) {
+  if (!value) {
+    return null
+  }
+
+  return (
+    getEnumValues(TimeRangePreset).find((timeRangePreset) =>
+      isSameDateRange(value, getDateRangeFromPreset(timeRangePreset)),
+    ) ?? null
+  )
+}
+
 export default function RevenueTimeRangeControl({
   value,
   maxDate,
   onChange,
 }: RevenueTimeRangeControlProps) {
-  const [selectedPreset, setSelectedPreset] = useState<TimeRangePreset | null>(
-    defaultTimeRangePreset,
-  )
   const [isCustomDialogOpen, setIsCustomDialogOpen] = useState(false)
   const [startDateError, setStartDateError] =
     useState<DateValidationError>(null)
@@ -135,6 +144,8 @@ export default function RevenueTimeRangeControl({
   const [draftCustomRange, setDraftCustomRange] = useState<DraftDateRange>(
     getDraftDateRange(value ?? getDefaultCustomRange()),
   )
+  const selectedPreset =
+    getMatchingTimeRangePreset(value) ?? (value ? null : defaultTimeRangePreset)
   const menuValue = selectedPreset ?? CUSTOM_OPTION_VALUE
   const menuLabel = selectedPreset
     ? timeRangePresetMapName[selectedPreset]
@@ -143,15 +154,11 @@ export default function RevenueTimeRangeControl({
       : CUSTOM_OPTION_LABEL
 
   useEffect(() => {
-    if (!selectedPreset) {
+    if (!selectedPreset || value) {
       return
     }
 
-    const nextDateRange = getDateRangeFromPreset(selectedPreset)
-
-    if (!isSameDateRange(value, nextDateRange)) {
-      onChange(nextDateRange)
-    }
+    onChange(getDateRangeFromPreset(selectedPreset))
   }, [onChange, selectedPreset, value])
 
   function handleChange(nextValue: TimeRangeMenuValue) {
@@ -166,7 +173,7 @@ export default function RevenueTimeRangeControl({
       return
     }
 
-    setSelectedPreset(nextValue)
+    onChange(getDateRangeFromPreset(nextValue))
   }
 
   function handleStartMonthChange(nextStartMonth: Date | null) {
@@ -210,7 +217,6 @@ export default function RevenueTimeRangeControl({
       return
     }
 
-    setSelectedPreset(null)
     onChange(draftCustomRange)
     setIsCustomDialogOpen(false)
   }

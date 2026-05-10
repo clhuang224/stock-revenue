@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Button, Container, Typography } from '@mui/material'
 import { isWithinInterval } from 'date-fns'
@@ -13,9 +12,8 @@ import RevenueTimeRangeControl, {
 } from './components/home/RevenueTimeRangeControl'
 import RevenueTrendChart from './components/RevenueTrendChart'
 import StockAutocomplete from './components/StockAutocomplete'
-import usePersistedStockId from './hooks/usePersistedStockId'
+import useRevenueSearchParams from './hooks/useRevenueSearchParams'
 import type { RevenuePoint } from './interfaces/RevenuePoint'
-import { DEFAULT_STOCK_ID } from './constants/defaultStockId'
 import { formatNumber, formatPercent } from './utils/format'
 
 function getTableMonthId(point: RevenuePoint) {
@@ -59,7 +57,7 @@ function filterRevenuePointsByDateRange(
   dateRange: RevenueTimeRange,
 ) {
   return revenuePoints.filter((point) =>
-    isWithinInterval(new Date(point.date), {
+    isWithinInterval(new Date(point.year, point.month - 1, 1), {
       start: dateRange.startDate,
       end: dateRange.endDate,
     }),
@@ -67,17 +65,13 @@ function filterRevenuePointsByDateRange(
 }
 
 export default function Home() {
-  const [revenueTimeRange, setRevenueTimeRange] =
-    useState<RevenueTimeRange | null>(null)
-  const {
-    stockId: selectedStockId,
-    isReady: isStockIdReady,
-    setStockId: setSelectedStockId,
-  } = usePersistedStockId(DEFAULT_STOCK_ID)
+  const revenueSearchParams = useRevenueSearchParams()
+  const selectedStockId = revenueSearchParams.stockId
+  const revenueTimeRange = revenueSearchParams.dateRange
   const stocksQuery = useQuery(stocksQueryOptions())
   const revenueQuery = useQuery({
     ...revenueQueryOptions(selectedStockId),
-    enabled: isStockIdReady,
+    enabled: revenueSearchParams.isReady,
   })
   const stocks = stocksQuery.data ?? []
   const selectedStock =
@@ -90,7 +84,8 @@ export default function Home() {
   const tableRows = buildTableRows(filteredRevenuePoints)
   const hasRawRevenueData = revenuePoints.length > 0
   const hasRevenueData = filteredRevenuePoints.length > 0
-  const isRevenueLoading = !isStockIdReady || revenueQuery.isLoading
+  const isRevenueLoading =
+    !revenueSearchParams.isReady || revenueQuery.isLoading
   const isTimeRangeLoading = hasRawRevenueData && !revenueTimeRange
   const isRevenueDataLoading = isRevenueLoading || isTimeRangeLoading
 
@@ -123,8 +118,8 @@ export default function Home() {
           <StockAutocomplete
             options={stocks}
             value={selectedStock}
-            loading={stocksQuery.isLoading || !isStockIdReady}
-            onChange={setSelectedStockId}
+            loading={stocksQuery.isLoading || !revenueSearchParams.isReady}
+            onChange={revenueSearchParams.setStockId}
           />
         </Container>
       </Box>
@@ -145,7 +140,7 @@ export default function Home() {
           }}
         >
           <HomePanel
-            loading={stocksQuery.isLoading || !isStockIdReady}
+            loading={stocksQuery.isLoading || !revenueSearchParams.isReady}
             title={
               selectedStock
                 ? `${selectedStock.stockName} (${selectedStock.stockId})`
@@ -156,11 +151,13 @@ export default function Home() {
           <HomePanel
             leftAction={<Button variant="contained">每月營收</Button>}
             rightAction={
-              <RevenueTimeRangeControl
-                value={revenueTimeRange}
-                maxDate={new Date()}
-                onChange={setRevenueTimeRange}
-              />
+              revenueSearchParams.isReady ? (
+                <RevenueTimeRangeControl
+                  value={revenueTimeRange}
+                  maxDate={new Date()}
+                  onChange={revenueSearchParams.setDateRange}
+                />
+              ) : null
             }
           >
             <RevenueTrendChart

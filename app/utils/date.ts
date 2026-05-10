@@ -1,5 +1,12 @@
-import { endOfDay, format, startOfDay, startOfMonth, subMonths } from 'date-fns'
-import type { FinMindDate } from '../types/FinMindDate'
+import {
+  endOfDay,
+  format,
+  isValid,
+  startOfDay,
+  startOfMonth,
+  subMonths,
+} from 'date-fns'
+import { FinMindDate } from '../types/FinMindDate'
 
 export type DateRange = {
   startDate: Date
@@ -28,6 +35,25 @@ export function createWithinDateRange(
     startDate: startOfDay(subMonths(baseDate, monthCount)),
     endDate,
   }
+}
+
+export function formatDateParam(date: Date) {
+  return String(date.getTime())
+}
+
+export function parseDateParam(value: string | null) {
+  if (!value) {
+    return null
+  }
+
+  const timestamp = Number(value)
+  const date = new Date(timestamp)
+
+  if (!Number.isSafeInteger(timestamp) || !isValid(date)) {
+    return null
+  }
+
+  return date
 }
 
 export function formatFinMindDate(date: Date): FinMindDate {
